@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/config.ts","./src/main.tsx","./src/vite-env.d.ts","./src/aa/client.ts","./src/aa/zkLoginValidator.ts","./src/auth/nonce.ts","./src/auth/prove.ts","./src/auth/prover.worker.ts","./src/auth/validateJwt.ts","./src/test/validatorEncoding.test.ts","./vite.config.ts"],"version":"5.9.3"}
