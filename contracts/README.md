@@ -20,5 +20,9 @@ forge build
 forge test
 ```
 
+Or, with Docker installed, run `pnpm test:contracts:docker` from the repository
+root. It uses the Foundry container, installs the exact test libraries, checks
+formatting, builds, and runs the test suite.
+
 Deploy only after a frozen JWK snapshot and app ID have been generated. The
 deployer private key must never be placed in browser configuration or Git.

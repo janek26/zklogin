@@ -32,6 +32,13 @@ forge test
 cd ..
 ```
 
+If you have Docker but do not want a local Foundry install, run the equivalent
+containerized gate from the repository root:
+
+```sh
+pnpm test:contracts:docker
+```
+
 ## 2. Create external testnet configuration
 
 1. Create one **Google Web OAuth client**. Add `http://localhost:5173` to its
@@ -95,7 +102,8 @@ send a small test amount to an EOA.
 
 Before a demo, pass all of these:
 
-- `pnpm verify` and, where available, `pnpm test:contracts:foundry`.
+- `pnpm verify` and either `pnpm test:contracts:foundry` or
+  `pnpm test:contracts:docker`.
 - `pnpm verify:deployment` against the final Base Sepolia generation.
 - A real fresh Google token, browser-local proof, sponsored activation, and
   native transfer on Base Sepolia.
