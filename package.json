@@ -7,14 +7,21 @@
     "build": "pnpm --dir apps/web build",
     "typecheck": "pnpm --dir apps/web typecheck",
     "test": "pnpm --dir apps/web test",
-    "test:contracts": "cd contracts && forge test",
+    "test:contracts": "node scripts/test-contracts.mjs",
+    "test:contracts:foundry": "cd contracts && forge test",
+    "verify": "pnpm typecheck && pnpm test && pnpm build && pnpm test:contracts",
+    "setup:check": "node scripts/check-prereqs.mjs",
     "snapshot:jwks": "node scripts/snapshot-google-jwks.mjs",
     "app-id": "node scripts/make-app-id.mjs",
     "verify:deployment": "node scripts/verify-deployment.mjs"
   },
   "devDependencies": {
+    "@openzeppelin/contracts": "5.6.1",
     "@openzeppelin/merkle-tree": "1.0.8",
     "@shield-labs/zklogin": "0.6.1",
+    "ethers": "6.16.0",
+    "ganache": "7.9.2",
+    "solc": "0.8.30",
     "viem": "2.55.1"
   },
   "pnpm": {

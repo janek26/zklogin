@@ -5,7 +5,7 @@ Base Sepolia native transfers. This is unaudited, testnet-only research code.
 The temporary browser key is a general Kernel root UserOperation signer while
 active; "native only" is a UI constraint, not an on-chain policy.
 
-## Prerequisites
+## Quick start
 
 - Node 22.23.1 and pnpm 11.12.0
 - Foundry (for Solidity build/test/deploy)
@@ -13,6 +13,17 @@ active; "native only" is a UI constraint, not an on-chain policy.
   sponsorship, and a funded deployment key held outside the repository
 - Written license clarification from Shield Labs before copying/modifying or
   redistributing Shield source
+
+Install and run all locally executable checks:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm setup:check
+pnpm verify
+```
+
+See [SETUP.md](SETUP.md) for the guided Google/ZeroDev/deployment process,
+Foundry commands, release gates, and security requirements.
 
 ## Generate one immutable deployment generation
 
@@ -24,7 +35,7 @@ active; "native only" is a UI constraint, not an on-chain policy.
    `contracts/script/Deploy.s.sol` with a non-browser deployer key.
 6. Update `src/generated/deployment.json` exactly once, then run
    `pnpm verify:deployment`.
-7. `pnpm typecheck && pnpm test && pnpm build && pnpm test:contracts`.
+7. `pnpm verify` and, where Foundry is available, `pnpm test:contracts:foundry`.
 
 `jwk-snapshot.json` and `deployment.json` are intentionally checked-in
 templates until steps 2–6 have been completed. The application refuses to boot

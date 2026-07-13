@@ -1,6 +1,17 @@
 # Contracts
 
-Install Foundry and then initialize the pinned test dependencies:
+Run the repository-level contract integration suite first:
+
+```sh
+pnpm test:contracts
+```
+
+It compiles and deploys the validator to an in-memory EVM and executes proof,
+Merkle/JWK, nonce, exact-activation, EIP-191, session, expiry-data, ERC-1271,
+and uninstall assertions. It deliberately uses a strict mock verifier; a real
+UltraVerifier/Base Sepolia proof is a separate release gate.
+
+Install Foundry to run the complementary Solidity suite and deployment script:
 
 ```sh
 forge install foundry-rs/forge-std@v1.9.7 OpenZeppelin/openzeppelin-contracts@v5.6.1
