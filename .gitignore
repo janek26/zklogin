@@ -7,5 +7,6 @@ contracts/cache/
 contracts/broadcast/
 contracts/lib/
 *.log
+*.tsbuildinfo
 .home/
 .pnpm-store/
