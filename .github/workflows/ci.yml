@@ -58,9 +58,10 @@ jobs:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_ZERODEV_PROJECT_ID: ${{ secrets.VITE_ZERODEV_PROJECT_ID }}
           VITE_MEGAETH_TESTNET_RPC_URL: https://carrot.megaeth.com/rpc
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/web/dist --project-name=zklogin-poc
+      - name: Install and run Wrangler
+        run: |
+          npm install -g wrangler
+          wrangler pages deploy apps/web/dist --project-name=zklogin-poc
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
