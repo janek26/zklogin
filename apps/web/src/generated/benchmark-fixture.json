@@ -1,0 +1,260 @@
+{
+  "jwt": "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJjOGY3YWY1OGRiNDRjZjZlYWEyZWQxMGVjODBmMzQwOGNmZGU0NjUiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhdWQiOiJiZW5jaG1hcmstY2xpZW50LWlkIiwic3ViIjoiYmVuY2htYXJrLXN1YmplY3QtMTIzNDU2IiwiaWF0IjoxNzg0MDI5NTE3LCJleHAiOjE3ODQwMzMxMTcsIm5vbmNlIjoiYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYSJ9.e7QF4km_mPh9GLlL4or2SbSBIFCQoEl_Wk1swqiiqlFAxHfoa9Qo_91-fu1SciyZfDHqzmfE2kLTnvv9urRr_-xZdLi-7dgv6S7XPBGQZVkRajUGLAltdASE3hEBIBjcZBxcB6ZKTcjVN6b1S-bovj4N_Ir09CyF_F2-IeeI7o5qiqexbEmbwQy-S9xujcE_OQMFaLzg6jj-ogytfyc8qozmSCscWZgrpM2mbiPpMIE2_NPikfH5TY28kWuBuV8RzKGL-jYcsWM-Vv-9fh0IXW_NcgQUe6YmEtEBojgA3p3ntlDyVDZQuzyutT88FpdBpdfIU2CqjpR8ylEQxqhtyw",
+  "expectedNonce": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "accountId": "0x00c4d0d091d508bb6bcff620d8df2b9babfe0459201eb9b53acdfedaa3d6d035",
+  "publicKeyHash": "0x04a2afff974a4244f5d39cddc8cd5bbdaba05de1eec99e4cff20d6a8f3186dde",
+  "jwkSnapshot": {
+    "fetchedAt": "2026-07-14T06:37:16.490Z",
+    "source": "https://www.googleapis.com/oauth2/v3/certs",
+    "root": "0x32a0b760094a508cd1b3480d9edbc709c05a8317b679764bdaec0494225067cb",
+    "tree": {
+      "format": "standard-v1",
+      "leafEncoding": [
+        "bytes32"
+      ],
+      "tree": [
+        "0x32a0b760094a508cd1b3480d9edbc709c05a8317b679764bdaec0494225067cb",
+        "0x9d31b65b7ce87d44c471007028db8071f57938c339ba3b6529644297cc55d649",
+        "0x1c6986242fbb09e8d27163fa91705195d157928ba168c38af8d6b28c131f6894",
+        "0xe0bb0d8f444829d93ce60a43dbd2539c651c878ed058ff930a4b2705b7baac07",
+        "0xcfccea7d80125e42493a6429732af5cedad20f6da55b6feaf2bbe9d2f182a933",
+        "0xa4dba7b52b4566d5856267fa6383c2a8094704c71146a6fff2e9a7950e062cf5",
+        "0x18676e39812c081362199fa5b2ef04e29d595db686ed2736a14597558f95df26"
+      ],
+      "values": [
+        {
+          "value": [
+            "0x18e9a377631ed05fbd2cbd2f4fc134124a2573e992c01d25ff20847c0437da9e"
+          ],
+          "treeIndex": 3
+        },
+        {
+          "value": [
+            "0x154a91667a970d71aa88c0c2bc203300c3d7161d4372778c0730d104c1a34da0"
+          ],
+          "treeIndex": 6
+        },
+        {
+          "value": [
+            "0x20bcccc1e6b6a4b2b6cf7b0c8d1378b499e5a4133d26dee98091272ab5fd6f32"
+          ],
+          "treeIndex": 5
+        },
+        {
+          "value": [
+            "0x09bc502ddb94130bd002b5b74b56da283682478d36f042e520c5fa84dba1bd58"
+          ],
+          "treeIndex": 4
+        }
+      ]
+    },
+    "keys": [
+      {
+        "authProviderId": "0x409c553b466e0b29e91ab6892ccbf8360affec5d46eb90cd97858e17c87050be",
+        "kid": "bc8f7af58db44cf6eaa2ed10ec80f3408cfde465",
+        "limbs": {
+          "public_key_limbs": [
+            "0x0a1b125c878181c7efa0c1cf9db767",
+            "0x212d626fb2654a8bfefa368f09dbd4",
+            "0xbd598ae854647b74e621f47c3505cd",
+            "0xe64bc0bd5cc3d0c94afb6999b5a39f",
+            "0x5d2ccf2f62b3dc4dde19ae7b324fb3",
+            "0x32e3cb447ccf9ae28711144f83bdfb",
+            "0x6ea87aa8c8964d6a580ebe6373714d",
+            "0xebb23b0077ac14b2b49470b8a3bce6",
+            "0xffc547415b6c683bdb5416e042ea39",
+            "0xcb881c5bd3c354bcdb96d9fdaf8bec",
+            "0x699c98e20c8703aa3db61451a6497a",
+            "0x113e277bd579f6b86379694082b8e8",
+            "0x2a5e15c007163b502c5a78f8b846fb",
+            "0x1ad7ef6747941edf846ee657a0f6cc",
+            "0x381bc4fc1c795b3ba796e52fddde95",
+            "0x5a4165dc7c9d738580c5a699c09f51",
+            "0xc5b4c3041060e0c6547591e3afc94d",
+            "0x98"
+          ],
+          "public_key_redc_limbs": [
+            "0x8a25b92d9b78f7faad793840319aaf",
+            "0xb59c143e91f968a9235086092c9257",
+            "0xc67f0ab2f8f8aa70dda9a8b262b288",
+            "0xaded0239b2dd2480fbf3650c135313",
+            "0xbf575ad7c3e4b44cd35f52775cf93f",
+            "0x121461f3fb5381d6ea70720d329b49",
+            "0xf2db9f0b5f4c0a5b74d2c5fa1188f3",
+            "0x4fa65d8778184a969db4f053867231",
+            "0x52619a1d51588ab9fb362544891f8c",
+            "0x70a652edc20bbd0c21e09a59296d75",
+            "0x0e0824de54058209436189dc6e8cbe",
+            "0x26681aaae0c5aaf084ec1befd0096f",
+            "0xd44414e0de3dfb50253ee43aafa283",
+            "0x473fdb4461e8d761fddc7b31ae455b",
+            "0x8de6c95acf20c8cbdba28a29ff74a3",
+            "0xd89c99e6738d01dd965d9c57d00de0",
+            "0xa7325e7382b033c5aeb7f8a9ddbf8b",
+            "0x1acf"
+          ]
+        },
+        "hash": "0x04a2afff974a4244f5d39cddc8cd5bbdaba05de1eec99e4cff20d6a8f3186dde",
+        "jwkProof": [
+          "0xcfccea7d80125e42493a6429732af5cedad20f6da55b6feaf2bbe9d2f182a933",
+          "0x1c6986242fbb09e8d27163fa91705195d157928ba168c38af8d6b28c131f6894"
+        ]
+      },
+      {
+        "authProviderId": "0x409c553b466e0b29e91ab6892ccbf8360affec5d46eb90cd97858e17c87050be",
+        "kid": "5896225329794346b0639e6f9d7bd8bce2954fd2",
+        "limbs": {
+          "public_key_limbs": [
+            "0x06ddfac61bba5b2b1dac38318a3763",
+            "0x06cc08da9500141114b09086e95810",
+            "0x30e421395cd64f8a64c3b6447db7cc",
+            "0xff6665c0334bd1aecde3c930db1b2a",
+            "0xfa5250c422755a792aefb077462ee8",
+            "0xf2b4bdd6fc4957aa0aef0dd0ce5289",
+            "0xfeca0d66251b3d95e801fb692ea7df",
+            "0xc6c80730035de26603217f2b6b8fe4",
+            "0xb68e8676022ef316a9516a5794c93c",
+            "0x5008c412d13ac4b6e3cf4dddbc1638",
+            "0x81f5915a0e727f0b72ddf5f84865a1",
+            "0x8aa27130f93dce81fc13bc2e34abdd",
+            "0x06c755bbc153cf1e52c6c677b66569",
+            "0x3b680f418b3fc2c24f6c897c91f960",
+            "0xca6acba70c4e1852d83b6bf81c8a76",
+            "0x1bf39326e42f6d5e3827a32fdb7624",
+            "0x3192b9ddc6c7ef76c9eb9cbbb04802",
+            "0xb2"
+          ],
+          "public_key_redc_limbs": [
+            "0x6c35c58ba171b0cdf41707caf5ff25",
+            "0xbc775a1775b447bd9b3ce229bbe6c6",
+            "0xef626010abf133c1af36960e295560",
+            "0x8d383f39daf8037d03fef2286784f3",
+            "0x6dc9ad6faf96d38afbd8a17d5ce4ce",
+            "0x2572c295e2747c0996ba13afd327bf",
+            "0x455280a11bf28ee09164a9bb38983f",
+            "0x3224a0a578216670afa4edfbb91d95",
+            "0xd89e4e61533abdd5fda39834fdf387",
+            "0x562c3a6877ef14324d44a649f4b2e4",
+            "0x31a85e664c4cbdff28cd11618e93",
+            "0xaeb76407f235281660359250dc43fc",
+            "0x569f0b6a2e818ab8a7d6526dcbd7f7",
+            "0xaac9bf36105cbffaa6c8b2c25ea622",
+            "0x04bf81d55ffe181ae44d7496fd7a36",
+            "0xadd715d6216bcd62c81e0bc557b2b0",
+            "0x79874717e4a66426c87610b03a475d",
+            "0x16fc"
+          ]
+        },
+        "hash": "0x154a91667a970d71aa88c0c2bc203300c3d7161d4372778c0730d104c1a34da0",
+        "jwkProof": [
+          "0xa4dba7b52b4566d5856267fa6383c2a8094704c71146a6fff2e9a7950e062cf5",
+          "0x9d31b65b7ce87d44c471007028db8071f57938c339ba3b6529644297cc55d649"
+        ]
+      },
+      {
+        "authProviderId": "0x409c553b466e0b29e91ab6892ccbf8360affec5d46eb90cd97858e17c87050be",
+        "kid": "8f4730071a99b44ef52dbd6dac2d96af3a7c9b3f",
+        "limbs": {
+          "public_key_limbs": [
+            "0xf3ca1f57187dac34ef16405d5896db",
+            "0x9036535cafb86a7feb333828907212",
+            "0x140dbef8905a39815cd942b1a5c433",
+            "0x241d8ec02e94b7858b5372def59de0",
+            "0x899052eda122ab075137892045ab7b",
+            "0xb3b0c87572b98c67413b611c7f019a",
+            "0xd70b5224d7283a1f8e4781447b208d",
+            "0x787e787ba29b7649f2e48c006db3e1",
+            "0xe98b21ebf6c72dc44bba267d546778",
+            "0x587094aea9c2e568d5336783a7268e",
+            "0xcafa1a4bb2bfbaaabadc7c1b759d04",
+            "0x5f0c678244eeaddcb1ea40cea6b4eb",
+            "0xd827eb6378b565637d2b679416afb0",
+            "0x4420ab4d58ce6e6f1e31dc1966362a",
+            "0x76df372f255b8c6261541132544380",
+            "0x5de12e9d58a2dbc4e167e6ab152831",
+            "0xe1865110e876cebd634ca1b6eabecc",
+            "0xd9"
+          ],
+          "public_key_redc_limbs": [
+            "0xc8d4e3093510550e02197053b6e4ef",
+            "0x7d7e48777237855167e65c2de5115f",
+            "0x919e8202db25f23858f7c7af119e1d",
+            "0xe475a755dea974c271d35b0f23dc37",
+            "0x4edb34f4c54c61f14d55e8569c5475",
+            "0x6ebf038240a37f8455c1e4ddfcf3c1",
+            "0x79e1d1e46c922165829abb80fe2f2a",
+            "0x6060fcd5e293ec16772070e6e22243",
+            "0xc791db4b36993b65269fc99327037c",
+            "0xd82652aa3e4dc8f7f3e0b7b39f01b7",
+            "0x82a863b86c38a61c29a85def58e1f0",
+            "0x7f43e14719e225bdbf6a4401584896",
+            "0xc98fe744dbb49eab637d02da1cc986",
+            "0x7f28dc701187839981709052c13f84",
+            "0x28649304cc52bc34f783a7ef1e484e",
+            "0x06b450beb4ca60a6e2708af8595600",
+            "0x9c14f543817986c4dd8f98973f973b",
+            "0x12cc"
+          ]
+        },
+        "hash": "0x20bcccc1e6b6a4b2b6cf7b0c8d1378b499e5a4133d26dee98091272ab5fd6f32",
+        "jwkProof": [
+          "0x18676e39812c081362199fa5b2ef04e29d595db686ed2736a14597558f95df26",
+          "0x9d31b65b7ce87d44c471007028db8071f57938c339ba3b6529644297cc55d649"
+        ]
+      },
+      {
+        "authProviderId": "0x409c553b466e0b29e91ab6892ccbf8360affec5d46eb90cd97858e17c87050be",
+        "kid": "f10f87405a979c1df36df26606734f33cd85c271",
+        "limbs": {
+          "public_key_limbs": [
+            "0xa87cff83fe3256df812f4252f424b3",
+            "0x9c01ed3ec5acc0927263bb9af1505c",
+            "0xc96818989e4dfff7afefe712bb3687",
+            "0xa21242131c3a2bd668b53f52d28a00",
+            "0x8a6e2c80617a5e951fc768151359e8",
+            "0xf450a308fdda44147a7ace283e180a",
+            "0x02d5baf03ba375831038e8abe21769",
+            "0xf6a0516863e73d8bea8fe9966b0f0f",
+            "0xca8dd9ac81ef00a5ef81afe8e3956e",
+            "0x6fc204b20c2fa0af4a1fabd1f81646",
+            "0x0e9e92135f685713412d13fb6f6a97",
+            "0x26d400c3a0a05fa742625eb5c93136",
+            "0xe01c7feecbca1c8e21cbff584cb369",
+            "0x6376699731d74f89f32750c6735bf6",
+            "0x032ca74367ab1d2933b39fc74c2cdf",
+            "0x20bebb92c2d8c4fb6fc196673b6236",
+            "0xb639bb064ad5d43e515801e6ce0d2f",
+            "0xe2"
+          ],
+          "public_key_redc_limbs": [
+            "0xb9499a12bbe564337eeace8f650ed7",
+            "0x16b58dccf6bcafd11bbcf45c0bd399",
+            "0xbc533e414cff21ce52c90d0be11019",
+            "0xa3f1dce72db94b5a71077a3e1b1355",
+            "0x7bedda355657dcb5b460691c9f5c96",
+            "0x76d5bcd350b442b1b479f7c27a74d8",
+            "0x3f0dca40a2ef11246579a1785c46f7",
+            "0x3aaf92e157badd3277dc05ea06230d",
+            "0x5ca2d6e71e210445b3d154602582b2",
+            "0x2a6fe534e05a033ce018ed7175e969",
+            "0xaf05b8df7de3b29fbcc7ebc4898b23",
+            "0x0546355edba5d7d81c3bddbc465edb",
+            "0x67c64665138b0f739f654e03fa3f46",
+            "0xb9cf0827c0de6c4cf0d0f3ed71bc1e",
+            "0x155227327fd480aa04a146d967e8be",
+            "0x6a1e99cb21bd75b9d3d1865889b0d1",
+            "0x263629ed59f4af20dea5b4c63d5344",
+            "0x1211"
+          ]
+        },
+        "hash": "0x09bc502ddb94130bd002b5b74b56da283682478d36f042e520c5fa84dba1bd58",
+        "jwkProof": [
+          "0xe0bb0d8f444829d93ce60a43dbd2539c651c878ed058ff930a4b2705b7baac07",
+          "0x1c6986242fbb09e8d27163fa91705195d157928ba168c38af8d6b28c131f6894"
+        ]
+      }
+    ],
+    "benchmarkNote": "Generated by gen-benchmark-fixture.mjs — not for on-chain use"
+  },
+  "generatedAt": "2026-07-14T11:45:17.041Z"
+}

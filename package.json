@@ -4,6 +4,9 @@
   "version": "0.1.0",
   "packageManager": "pnpm@11.12.0",
   "scripts": {
+    "bench": "node scripts/run-benchmark.mjs --runs=1",
+    "bench:coi": "node scripts/run-benchmark.mjs --runs=1 --coi",
+    "bench:fixture": "node scripts/gen-benchmark-fixture.mjs",
     "build": "apps/web/node_modules/.bin/tsc -b apps/web/tsconfig.json && apps/web/node_modules/.bin/vite build apps/web --config apps/web/vite.config.ts",
     "typecheck": "apps/web/node_modules/.bin/tsc --noEmit -p apps/web/tsconfig.json",
     "test": "apps/web/node_modules/.bin/vitest run --root apps/web",

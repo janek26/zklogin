@@ -82,6 +82,7 @@ export function Onboarding({
         <div className="google-slot">
           <GoogleLogin
             nonce={preLogin.googleNonce}
+            use_fedcm_for_button={true}
             theme="outline"
             shape="pill"
             size="large"

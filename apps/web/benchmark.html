@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prover Benchmark</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, system-ui, sans-serif; background: #0a0a0a; color: #e0e0e0; padding: 24px; }
+    h1 { font-size: 20px; margin-bottom: 16px; }
+    .controls { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; }
+    button { padding: 10px 20px; border: 1px solid #444; background: #1a1a1a; color: #e0e0e0; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    button:hover:not(:disabled) { background: #2a2a2a; }
+    button:disabled { opacity: 0.4; cursor: default; }
+    .info { font-size: 13px; color: #888; }
+    #status { font-size: 14px; margin-bottom: 16px; min-height: 20px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #222; }
+    th { color: #888; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    td.ms { text-align: right; font-variant-numeric: tabular-nums; }
+    td.stage { font-family: monospace; font-size: 13px; }
+    .total-row td { font-weight: 700; border-top: 2px solid #444; border-bottom: none; }
+    .meta { margin-top: 16px; font-size: 12px; color: #666; line-height: 1.6; }
+    .error { color: #ff6b6b; }
+    .success { color: #6bcf7f; }
+    #raw-output { margin-top: 16px; font-size: 11px; color: #666; white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto; font-family: monospace; }
+  </style>
+</head>
+<body>
+  <h1>Prover Benchmark</h1>
+  <div class="controls">
+    <button id="run-btn">Run Benchmark</button>
+    <button id="run-5-btn">Run 5x</button>
+    <span class="info" id="env-info"></span>
+  </div>
+  <div id="status"></div>
+  <table id="results-table">
+    <thead>
+      <tr><th>Stage</th><th class="ms">Time (ms)</th></tr>
+    </thead>
+    <tbody id="results-body"></tbody>
+  </table>
+  <div class="meta" id="meta"></div>
+  <div id="raw-output"></div>
+
+  <script type="module">
+    import fixture from './src/generated/benchmark-fixture.json'
+
+    const envInfo = document.getElementById('env-info')
+    const status = document.getElementById('status')
+    const runBtn = document.getElementById('run-btn')
+    const run5Btn = document.getElementById('run-5-btn')
+    const resultsBody = document.getElementById('results-body')
+    const meta = document.getElementById('meta')
+    const rawOutput = document.getElementById('raw-output')
+
+    const isCOI = window.crossOriginIsolated
+    const hasSAB = typeof SharedArrayBuffer !== 'undefined'
+    envInfo.textContent = `cores=${navigator.hardwareConcurrency} | mem=${navigator.deviceMemory ?? '?'}GB | COI=${isCOI} | SAB=${hasSAB}`
+
+    function setStatus(msg, cls = '') {
+      status.textContent = msg
+      status.className = cls
+    }
+
+    function renderResult(result) {
+      resultsBody.innerHTML = ''
+      let total = 0
+      for (const m of result.marks) {
+        total += m.ms
+        const row = document.createElement('tr')
+        row.innerHTML = `<td class="stage">${m.stage}</td><td class="ms">${m.ms.toFixed(1)}</td>`
+        resultsBody.appendChild(row)
+      }
+      const totalRow = document.createElement('tr')
+      totalRow.className = 'total-row'
+      totalRow.innerHTML = `<td class="stage">TOTAL</td><td class="ms">${total.toFixed(1)}</td>`
+      resultsBody.appendChild(totalRow)
+
+      meta.innerHTML = `
+        <strong>Proof length:</strong> ${result.proofLength ?? '?'} bytes<br>
+        <strong>Actual threads:</strong> ${result.actualThreads ?? '?'}<br>
+        <strong>WASM pages:</strong> ${result.wasmPages ?? '?'} (${result.wasmPages ? (result.wasmPages * 65536 / 1024 / 1024).toFixed(1) + ' MB' : '?'})<br>
+        <strong>crossOriginIsolated:</strong> ${isCOI}<br>
+        <strong>SharedArrayBuffer:</strong> ${hasSAB}<br>
+        <strong>Proof (hex, first 80 chars):</strong> ${result.proofHex?.slice(0, 80) ?? '?'}…
+      `
+      rawOutput.textContent = JSON.stringify(result, null, 2)
+    }
+
+    async function runOnce() {
+      setStatus('Running benchmark…')
+      const worker = new Worker(new URL('./src/benchmark/bench-worker.ts', import.meta.url), { type: 'module' })
+      const startTime = performance.now()
+
+      const result = await new Promise((resolve) => {
+        worker.onmessage = (event) => resolve(event.data)
+        worker.onerror = (e) => resolve({ ok: false, error: e.message, marks: [] })
+        worker.postMessage({ jwt: fixture.jwt, expectedNonce: fixture.expectedNonce })
+      })
+
+      const wallTime = performance.now() - startTime
+      worker.terminate()
+
+      if (result.ok) {
+        setStatus(`Done in ${wallTime.toFixed(0)} ms wall time`, 'success')
+        renderResult(result)
+      } else {
+        setStatus(`Failed: ${result.error}`, 'error')
+        renderResult(result)
+      }
+      // Emit result via console for automated benchmark runners
+      console.log('__BENCH_RESULT__:' + JSON.stringify(result))
+      return result
+    }
+
+    runBtn.addEventListener('click', async () => {
+      runBtn.disabled = true
+      run5Btn.disabled = true
+      await runOnce()
+      runBtn.disabled = false
+      run5Btn.disabled = false
+    })
+
+    run5Btn.addEventListener('click', async () => {
+      runBtn.disabled = true
+      run5Btn.disabled = true
+      const results = []
+      for (let i = 0; i < 5; i++) {
+        setStatus(`Run ${i + 1}/5…`)
+        const r = await runOnce()
+        results.push(r)
+        if (!r.ok) break
+      }
+      if (results.every(r => r.ok)) {
+        const totals = results.map(r => r.marks.reduce((s, m) => s + m.ms, 0))
+        const sorted = [...totals].sort((a, b) => a - b)
+        const median = sorted[Math.floor(sorted.length / 2)]
+        const min = Math.min(...totals)
+        const max = Math.max(...totals)
+        const avg = totals.reduce((s, t) => s + t, 0) / totals.length
+        setStatus(`5 runs: median=${median.toFixed(0)}ms min=${min.toFixed(0)}ms max=${max.toFixed(0)}ms avg=${avg.toFixed(0)}ms`, 'success')
+      }
+      runBtn.disabled = false
+      run5Btn.disabled = false
+    })
+  </script>
+</body>
+</html>

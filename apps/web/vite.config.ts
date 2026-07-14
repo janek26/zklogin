@@ -2,7 +2,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? '/zklogin/' : '/',
+  base: '/',
   plugins: [react()],
   build: { target: 'esnext', sourcemap: false },
   optimizeDeps: {
@@ -10,4 +10,10 @@ export default defineConfig(({ mode }) => ({
     esbuildOptions: { target: 'esnext' },
   },
   worker: { format: 'es' },
+  server: process.env.BENCH_COI === '1' ? {
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'credentialless',
+    },
+  } : undefined,
 }))

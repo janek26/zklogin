@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-07-14T12:07:56.825Z",
+  "numRuns": 1,
+  "coi": false,
+  "results": [
+    {
+      "ok": true,
+      "marks": [
+        {
+          "stage": "generate witness",
+          "ms": 661.0999999940395
+        },
+        {
+          "stage": "generate proof",
+          "ms": 45778
+        },
+        {
+          "stage": "total_proveJwt",
+          "ms": 46901.90000000596
+        }
+      ],
+      "proofLength": 2144,
+      "envInfo": "cores=18 | mem=16GB | COI=false | SAB=false"
+    }
+  ]
+}
