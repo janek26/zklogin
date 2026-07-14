@@ -2,5 +2,5 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: credentialless
   Permissions-Policy: cross-origin-isolated=(self)
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client 'wasm-unsafe-eval'; frame-src https://accounts.google.com https://accounts.google.com/gsi/; connect-src 'self' https://carrot.megaeth.com https://rpc.zerodev.app; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client 'wasm-unsafe-eval'; frame-src https://accounts.google.com https://accounts.google.com/gsi/; connect-src 'self' https://accounts.google.com https://carrot.megaeth.com https://rpc.zerodev.app; img-src 'self' data: https://*.googleusercontent.com; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'
   Referrer-Policy: no-referrer
