@@ -574,6 +574,15 @@ svg {
 
 /* Unsupported */
 
+
+.spin-once svg {
+  animation: spin-once .5s ease-out;
+}
+
+@keyframes spin-once {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 .unsupported {
   width: min(100%, 460px);
   padding: 32px;
