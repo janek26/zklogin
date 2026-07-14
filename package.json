@@ -33,3 +33,4 @@
   "pnpm": {
     "onlyBuiltDependencies": ["bufferutil", "utf-8-validate"]
   }
+}
