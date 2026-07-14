@@ -29,7 +29,14 @@ export function Onboarding({
   onGoogleError: () => void
   onReset: () => void
 }) {
+
+function friendlyError(code: string): string {
+  if (code === 'PROVING_WORKER_CRASHED') return /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'iOS ran out of memory during proof generation. Try again with fewer tabs open, or switch to desktop.' : 'Proof generation was interrupted. Try again.'
+  if (code === 'PROVING_TIMEOUT') return 'Proof generation took too long. Try again on a faster device or with fewer tabs open.'
+  return code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
   const showProgress = stage === 'PROVING' || stage === 'ACTIVATING' || stage === 'PREPARING'
+  const isIosSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS|mercury/.test(navigator.userAgent)
   const showGoogle = !showProgress && stage !== 'ERROR'
 
   return (
@@ -39,7 +46,7 @@ export function Onboarding({
       <div className="hero-copy">
         <h1>{statusHeadline(stage)}</h1>
         <p>
-          {stage === 'PROVING' && 'Generating a zero-knowledge proof in your browser. This stays entirely local.'}
+          {stage === 'PROVING' && <>Generating a zero-knowledge proof in your browser. This stays entirely local.{isIosSafari && <> Keep this tab in the foreground — iOS may reload it under memory pressure.</>}</>}
           {stage === 'ACTIVATING' && `Deploying your smart account on ${config.chain.name} and activating your session key.`}
           {stage === 'PREPARING' && 'Generating an ephemeral session key and cryptographic nonce locally.'}
           {stage === 'GOOGLE_READY' && 'Google verifies your identity. A zero-knowledge proof is then created in your browser — nothing leaves this tab.'}
@@ -88,13 +95,12 @@ export function Onboarding({
             onError={onGoogleError}
           />
           <p>A single sign-in activates a 24-hour session.</p>
-        </div>
       )}
 
       {error && (
         <div className="alert" role="alert">
           <strong>We couldn&rsquo;t continue.</strong>
-          <span>{error}</span>
+          <span>{friendlyError(error)}</span>
           <button className="text-button" onClick={onReset}>Start a new session <ArrowIcon /></button>
         </div>
       )}

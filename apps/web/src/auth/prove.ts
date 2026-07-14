@@ -9,7 +9,9 @@ export function proveInBrowser(
 ): Promise<BrowserProof> {
   const worker = new Worker(new URL('./prover.worker.ts', import.meta.url), { type: 'module' })
   const { promise, resolve, reject } = Promise.withResolvers<BrowserProof>()
-  const timeout = window.setTimeout(() => { worker.terminate(); reject(new Error('PROVING_TIMEOUT')) }, 5 * 60_000)
+  let settled = false
+  const fail = (reason: string) => { if (settled) return; settled = true; window.clearTimeout(timeout); worker.terminate(); reject(new Error(reason)) }
+  const timeout = window.setTimeout(() => fail('PROVING_TIMEOUT'), 5 * 60_000)
 
   worker.onmessage = (event) => {
     if (event.data.type === 'phase') {
@@ -18,11 +20,12 @@ export function proveInBrowser(
       else onProgress?.({ phase: 'witness' })
       return
     }
-    window.clearTimeout(timeout)
-    worker.terminate()
-    event.data.ok ? resolve(event.data.response) : reject(new Error(event.data.error))
+    if (event.data.ok) resolve(event.data.response)
+    else fail(event.data.error ?? 'PROVING_FAILED')
+    settled = true; window.clearTimeout(timeout); worker.terminate()
   }
-  worker.onerror = () => { window.clearTimeout(timeout); worker.terminate(); reject(new Error('PROVING_WORKER_CRASHED')) }
+  worker.onerror = () => fail('PROVING_WORKER_CRASHED')
+  worker.onmessageerror = () => fail('PROVING_WORKER_CRASHED')
   worker.postMessage({ jwt, expectedNonce })
   return promise
 }
