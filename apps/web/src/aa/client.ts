@@ -7,7 +7,7 @@ import { config } from '../config'
 
 export const entryPoint = getEntryPoint('0.7')
 export const kernelVersion = KERNEL_V3_3
-export const publicClient = createPublicClient({ chain: config.chain, transport: http(config.publicRpcUrl) })
+export const publicClient = createPublicClient({ chain: config.chain, transport: http(config.publicRpcUrl), pollingInterval: 200 })
 
 export async function createWalletClients(validator: KernelValidator<'ZkLoginKernelValidator'>) {
   const account = await createKernelAccount(publicClient, { entryPoint, kernelVersion, index: 0n, plugins: { sudo: validator } })
@@ -16,12 +16,13 @@ export async function createWalletClients(validator: KernelValidator<'ZkLoginKer
   const kernelClient = createKernelAccountClient({
     account, chain: config.chain, client: publicClient, bundlerTransport: http(config.zeroDevRpcUrl),
     paymaster: { getPaymasterStubData: sponsor, getPaymasterData: sponsor },
+    pollingInterval: 200,
   })
   return { account, kernelClient }
 }
 
 export async function waitForSuccess(kernelClient: Awaited<ReturnType<typeof createWalletClients>>['kernelClient'], hash: Hex) {
-  const receipt = await kernelClient.waitForUserOperationReceipt({ hash, timeout: 120_000, retryCount: 60 })
+  const receipt = await kernelClient.waitForUserOperationReceipt({ hash, timeout: 60_000, retryCount: 300 })
   if (!receipt.success) throw new Error('USER_OPERATION_REVERTED')
   return receipt
 }

@@ -110,13 +110,13 @@ export function App() {
       await refreshBalance()
 
       const elapsed = Date.now() - started
-      if (elapsed < 3_000) await new Promise(r => window.setTimeout(r, 3_000 - elapsed))
+      if (elapsed < 1_500) await new Promise(r => window.setTimeout(r, 1_500 - elapsed))
 
       window.setTimeout(() => {
         sendDispatch({ type: 'SEND_DONE' })
         setRecipient('')
         setAmount('')
-      }, 2_000)
+      }, 1_000)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'SEND_FAILED')
       sendDispatch({ type: 'SEND_DONE' })
