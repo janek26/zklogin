@@ -1,49 +1,64 @@
-# zkLogin native wallet POC
+# zkLogin native wallet
 
 Browser-only Google zkLogin proof, ZeroDev Kernel 0.3.3 / EntryPoint 0.7, and
-Base Sepolia native transfers. This is unaudited, testnet-only research code.
-The temporary browser key is a general Kernel root UserOperation signer while
-active; "native only" is a UI constraint, not an on-chain policy.
+MegaETH testnet native transfers.
+
+**Unaudited research POC — testnet only.**
+
+## How it works
+
+1. Sign in with Google — your identity is verified via OAuth
+2. A zero-knowledge proof is generated entirely in your browser (Web Worker,
+   Noir/Aztec backend). Nothing leaves the tab.
+3. The proof activates an ephemeral session key (24h) on a Kernel smart account
+4. Transfers are signed by the session key and sponsored via ZeroDev paymaster
+
+The active browser session key is a full Kernel root signer during its 24-hour
+window. "Native only" is a UI constraint, not an on-chain policy.
 
 ## Quick start
 
 - Node 22.23.1 and pnpm 11.12.0
-- Foundry (for Solidity build/test/deploy)
-- A fixed Google Web OAuth client, a Base Sepolia ZeroDev project with bounded
-  sponsorship, and a funded deployment key held outside the repository
-- Written license clarification from Shield Labs before copying/modifying or
-  redistributing Shield source
-
-Install and run all locally executable checks:
+- Foundry for Solidity build, test, and deploy
+- A Google Web OAuth client and a ZeroDev project with sponsorship for
+  MegaETH testnet (chain 6343)
+- A deployer key held outside the repository
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm setup:check
 pnpm verify
+pnpm --dir apps/web dev
 ```
 
-See [SETUP.md](SETUP.md) for the guided Google/ZeroDev/deployment process,
-Foundry commands, release gates, and security requirements.
+See [SETUP.md](SETUP.md) for the full guided setup, deployment, and release
+gates.
 
-## Generate one immutable deployment generation
+## Structure
 
-1. `pnpm install`
-2. `pnpm snapshot:jwks` and commit the populated snapshot.
-3. `GOOGLE_CLIENT_ID=... pnpm app-id`; record the output.
-4. Populate the public values in `apps/web/.env.local` using `.env.example`.
-5. Check the pinned verifier/infrastructure then deploy the validator using
-   `contracts/script/Deploy.s.sol` with a non-browser deployer key.
-6. Update `src/generated/deployment.json` exactly once, then run
-   `pnpm verify:deployment`.
-7. `pnpm verify` and, where Foundry is available, `pnpm test:contracts:foundry`.
+```
+apps/web/src/
+  App.tsx                     state, effects, layout
+  config.ts                   chain + deployment config
+  aa/                         account abstraction (Kernel client, validator)
+  auth/                       prove, nonce, JWT validation, Web Worker
+  components/                 onboarding, wallet view, icons
+  lib/                        types, reducer, utils, session
+  generated/                  deployment JSON, JWK snapshot
+contracts/
+  src/                        ZkLoginKernelValidator, UltraVerifier
+  script/                     Foundry deploy script
+  test/                       Foundry test suite
+```
 
-`jwk-snapshot.json` and `deployment.json` are intentionally checked-in
-templates until steps 2–6 have been completed. The application refuses to boot
-with template values.
+## Verify
 
-## Development
+```sh
+pnpm verify          # typecheck, vitest, build, contract integration (16 assertions)
+pnpm verify:deployment  # on-chain contract audit
+```
 
-`pnpm --dir apps/web dev` starts Vite. Register `http://localhost:5173` in the
-Google OAuth client. Production must be HTTPS with the CSP/COOP headers in the
-implementation guide. Never log or persist JWTs, proofs, witnesses, or private
-keys outside same-tab `sessionStorage` for the active temporary key.
+## License
+
+Written license clarification from Shield Labs required before copying,
+modifying, or redistributing Shield source (`@shield-labs/zklogin`,
+`@shield-labs/zklogin-contracts`).
