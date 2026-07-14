@@ -605,6 +605,42 @@ svg {
 .unsupported h1 { font-size: 28px; }
 .unsupported p { color: #aaa8b8; line-height: 1.6; }
 
+.desktop-only {
+  width: min(100%, 480px);
+  padding: 44px 36px 36px;
+  text-align: center;
+  margin-top: 10vh;
+  animation: enter .45s ease-out;
+}
+
+.desktop-only-icon {
+  color: #b6ff6e;
+  margin-bottom: 18px;
+  opacity: .85;
+}
+
+.desktop-only h1 {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  margin: 0 0 12px;
+}
+
+.desktop-only p {
+  color: #aaa8b8;
+  line-height: 1.65;
+  font-size: 14px;
+  margin: 0;
+}
+
+.desktop-only-hint {
+  margin-top: 22px !important;
+  padding-top: 18px;
+  border-top: 1px solid #2a2933;
+  font-size: 13px !important;
+  color: #6b6978 !important;
+}
+
 /* Keyframes */
 
 @keyframes spin { to { transform: rotate(360deg); } }

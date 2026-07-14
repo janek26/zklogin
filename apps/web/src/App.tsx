@@ -32,6 +32,8 @@ export function App() {
   const [spinning, setSpinning] = useState(false)
   const proofStart = useRef(0)
   const unsupported = !window.Worker || !window.WebAssembly || !window.crypto || typeof BigInt === 'undefined'
+  const isMobile = (navigator.maxTouchPoints > 1 && window.matchMedia('(pointer: coarse)').matches)
+    || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
 
   const reset = useCallback(() => {
     sessionStorage.removeItem(READY_KEY)
@@ -163,6 +165,31 @@ export function App() {
         <section className="unsupported card">
           <h1>Unsupported browser</h1>
           <p>This wallet uses WebAssembly, Web Workers, Web Crypto, and BigInt to create proofs safely in your browser. Please use a modern browser.</p>
+        </section>
+      </main>
+    )
+  }
+
+  if (isMobile) {
+    return (
+      <main className="app-shell">
+        <section className="desktop-only card">
+          <div className="desktop-only-icon" aria-hidden="true">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+          </div>
+          <h1>Desktop only</h1>
+          <p>
+            This wallet generates zero-knowledge proofs entirely in your browser.
+            That requires significant memory and multiple CPU threads — resources
+            not yet available on mobile devices.
+          </p>
+          <p className="desktop-only-hint">
+            Open this page on a desktop or laptop to continue.
+          </p>
         </section>
       </main>
     )
