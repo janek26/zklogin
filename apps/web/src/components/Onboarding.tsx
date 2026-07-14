@@ -80,6 +80,7 @@ export function Onboarding({
             size="large"
             text="continue_with"
             width="352"
+            containerProps={{ className: 'google-btn-placeholder' }}
             onSuccess={(response) => {
               if (!response.credential) { onGoogleError(); return }
               onGoogleSuccess(response.credential)
