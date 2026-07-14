@@ -12,6 +12,12 @@ export function statusHeadline(stage: Stage) {
   return 'Sign in with Google'
 }
 
+function friendlyError(code: string): string {
+  if (code === 'PROVING_WORKER_CRASHED') return /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'iOS ran out of memory during proof generation. Try again with fewer tabs open, or switch to desktop.' : 'Proof generation was interrupted. Try again.'
+  if (code === 'PROVING_TIMEOUT') return 'Proof generation took too long. Try again on a faster device or with fewer tabs open.'
+  return code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
 export function Onboarding({
   stage,
   preLogin,
@@ -29,12 +35,6 @@ export function Onboarding({
   onGoogleError: () => void
   onReset: () => void
 }) {
-
-function friendlyError(code: string): string {
-  if (code === 'PROVING_WORKER_CRASHED') return /iPhone|iPad|iPod/.test(navigator.userAgent) ? 'iOS ran out of memory during proof generation. Try again with fewer tabs open, or switch to desktop.' : 'Proof generation was interrupted. Try again.'
-  if (code === 'PROVING_TIMEOUT') return 'Proof generation took too long. Try again on a faster device or with fewer tabs open.'
-  return code.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-}
   const showProgress = stage === 'PROVING' || stage === 'ACTIVATING' || stage === 'PREPARING'
   const isIosSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS|mercury/.test(navigator.userAgent)
   const showGoogle = !showProgress && stage !== 'ERROR'
@@ -95,6 +95,7 @@ function friendlyError(code: string): string {
             onError={onGoogleError}
           />
           <p>A single sign-in activates a 24-hour session.</p>
+        </div>
       )}
 
       {error && (
