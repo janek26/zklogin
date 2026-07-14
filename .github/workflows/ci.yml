@@ -32,7 +32,7 @@ jobs:
       contents: read
     environment:
       name: prod
-      url: https://zklogin-poc.rahrt.me
+      url: https://zklogin-poc.rahrt.com
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
