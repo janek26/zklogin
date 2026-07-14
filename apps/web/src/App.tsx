@@ -39,6 +39,7 @@ export function App() {
     setPreLogin(fresh)
     setWallet(null)
     setError(null)
+    setUserOpHash(null)
     setStage('GOOGLE_READY')
   }, [])
 
