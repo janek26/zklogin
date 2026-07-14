@@ -1,7 +1,7 @@
 import { GoogleLogin } from '@react-oauth/google'
 import { useCallback, useEffect, useState } from 'react'
 import type { Address, Hex } from 'viem'
-import { getAddress, isAddress, isHex, parseAbi, parseEther, size } from 'viem'
+import { formatEther, getAddress, isAddress, isHex, parseAbi, parseEther, size } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { createWalletClients, entryPoint, kernelVersion, publicClient, waitForSuccess } from './aa/client'
 import { makeActivationCallData, makeActivationInnerData, toZkLoginKernelValidator, type ProofAuth } from './aa/zkLoginValidator'
@@ -16,6 +16,20 @@ type StoredReadySession = { version: 1; privateKey: Hex; sessionKey: Address; va
 const PRELOGIN_KEY = 'zklogin.prelogin.v1'
 const READY_KEY = 'zklogin.ready.v1'
 const validatorStateAbi = parseAbi(['function accountState(address kernel) view returns (bytes32 accountId,address sessionKey,uint48 sessionValidUntil)'])
+
+function shortAddress(address: string) { return `${address.slice(0, 6)}…${address.slice(-4)}` }
+function statusCopy(stage: Stage) {
+  if (stage === 'PROVING') return ['Creating your private proof', 'This stays in your browser. It can take a moment.']
+  if (stage === 'ACTIVATING') return ['Activating your wallet', 'Deploying your Kernel account and approving this session key.']
+  if (stage === 'SENDING') return ['Sending your transfer', 'Waiting for Base Sepolia to confirm your UserOperation.']
+  if (stage === 'PREPARING') return ['Preparing a secure session', 'Generating a short-lived key and nonce locally.']
+  return ['Sign in once to get started', 'Google verifies your identity. Your proof is generated locally.']
+}
+
+function Mark() { return <span className="brand-mark" aria-hidden="true"><i /><i /><i /></span> }
+function CopyIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" /></svg> }
+function ArrowIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13" /><path d="m13 6 6 6-6 6" /></svg> }
+function RefreshIcon() { return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0 2 5.5" /><path d="M20 4v7h-7" /></svg> }
 
 function loadOrCreatePreLogin(): PreLoginSession {
   const raw = sessionStorage.getItem(PRELOGIN_KEY)
@@ -51,6 +65,7 @@ export function App() {
   const [amount, setAmount] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [userOpHash, setUserOpHash] = useState<Hex | null>(null)
+  const [copied, setCopied] = useState(false)
   const unsupported = !window.Worker || !window.WebAssembly || !window.crypto || typeof BigInt === 'undefined'
   const reset = useCallback(() => { sessionStorage.removeItem(READY_KEY); const fresh = createPreLoginSession(); sessionStorage.setItem(PRELOGIN_KEY, JSON.stringify(fresh)); setPreLogin(fresh); setWallet(null); setError(null); setStage('GOOGLE_READY') }, [])
   const refreshBalance = useCallback(async (address?: Address) => { const target = address ?? wallet?.account.address; if (target) setBalance(await publicClient.getBalance({ address: target })) }, [wallet])
@@ -109,9 +124,36 @@ export function App() {
     finally { setStage('READY') }
   }, [amount, recipient, refreshBalance, stage, wallet])
 
-  if (unsupported) return <main><h1>Unsupported browser</h1><p>This wallet requires WebAssembly, module Workers, Web Crypto, and BigInt.</p></main>
-  return <main><h1>zkLogin Native Wallet</h1><p>Base Sepolia · unaudited · testnet only</p><p>Status: <strong>{stage}</strong></p>{error && <p role="alert">{error}</p>}
-    {!wallet && (stage === 'GOOGLE_READY' || stage === 'ERROR') && <><GoogleLogin nonce={preLogin.googleNonce} onSuccess={(response) => { if (!response.credential) { setError('GOOGLE_RETURNED_NO_ID_TOKEN'); return } void completeGoogleLogin(response.credential, preLogin) }} onError={() => setError('GOOGLE_LOGIN_FAILED')} /><button onClick={reset}>New login session</button></>}
-    {wallet && <section><p>Address: <code>{wallet.account.address}</code> <button onClick={() => void navigator.clipboard.writeText(wallet.account.address)}>Copy</button></p><p>Balance: {balance.toString()} wei</p><button onClick={() => void refreshBalance()}>Refresh balance</button><label>Recipient<input value={recipient} onChange={(event) => setRecipient(event.target.value)} placeholder="0x..." /></label><label>Amount (ETH)<input value={amount} onChange={(event) => setAmount(event.target.value)} inputMode="decimal" /></label><button disabled={stage !== 'READY'} onClick={() => void sendNative()}>Send native ETH</button></section>}
-    {userOpHash && <p>UserOperation: <code>{userOpHash}</code></p>}<p>This UI constructs native transfers only. The active temporary key remains a full Kernel root signer until expiry.</p></main>
+  const copyAddress = useCallback(async () => {
+    if (!wallet) return
+    await navigator.clipboard.writeText(wallet.account.address)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1_800)
+  }, [wallet])
+
+  const [headline, description] = statusCopy(stage)
+  const sessionExpiry = wallet ? new Date(Number((sessionStorage.getItem(READY_KEY) ? JSON.parse(sessionStorage.getItem(READY_KEY)!).validUntil : 0) * 1_000)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : null
+
+  if (unsupported) return <main className="app-shell"><section className="unsupported card"><Mark /><p className="eyebrow">Unsupported browser</p><h1>One capability is missing.</h1><p>This wallet needs WebAssembly, module Workers, Web Crypto, and BigInt to create a proof safely in your browser.</p></section></main>
+  return <main className="app-shell">
+    <nav className="topbar" aria-label="Wallet navigation"><a className="wordmark" href="/"><Mark /><span>Glyph</span></a><div className="network-badge"><i /> Base Sepolia</div></nav>
+    <section className={`wallet-frame ${wallet ? 'is-ready' : ''}`}>
+      {!wallet && <div className="onboarding card">
+        <div className="card-header"><span className="step-pill">01 <span>of 01</span></span><span className="security-note">Local proof · no custody</span></div>
+        <div className="hero-copy"><p className="eyebrow">Your personal testnet wallet</p><h1>{headline}</h1><p>{description}</p></div>
+        {(stage === 'PROVING' || stage === 'ACTIVATING' || stage === 'PREPARING') ? <div className="progress-panel" aria-live="polite"><span className="spinner" /><div><strong>{stage === 'PROVING' ? 'Proving with Google' : stage === 'ACTIVATING' ? 'Submitting activation' : 'Generating session'}</strong><span>Keep this tab open</span></div></div> : <div className="google-slot"><GoogleLogin nonce={preLogin.googleNonce} theme="outline" shape="pill" size="large" text="continue_with" width="352" onSuccess={(response) => { if (!response.credential) { setError('GOOGLE_RETURNED_NO_ID_TOKEN'); return } void completeGoogleLogin(response.credential, preLogin) }} onError={() => setError('GOOGLE_LOGIN_FAILED')} /><p>One sign-in activates a 24-hour session.</p></div>}
+        {error && <div className="alert" role="alert"><strong>We couldn’t continue.</strong><span>{error}</span><button className="text-button" onClick={reset}>Start a new session <ArrowIcon /></button></div>}
+        <div className="trust-row"><span>Google identity</span><span>Browser proof</span><span>ZeroDev Kernel</span></div>
+      </div>}
+
+      {wallet && <div className="wallet-grid">
+        <section className="balance-card card"><div className="card-header"><div><p className="eyebrow">Available balance</p><button className="address-button" onClick={() => void copyAddress()} title="Copy wallet address"><span>{shortAddress(wallet.account.address)}</span><CopyIcon /></button></div><button className="icon-button" onClick={() => void refreshBalance()} title="Refresh balance"><RefreshIcon /></button></div><div className="balance-value">{Number(formatEther(balance)).toLocaleString(undefined, { maximumFractionDigits: 5 })}<span> ETH</span></div><div className="balance-meta"><span><i /> Ready to send</span><span>Session ends {sessionExpiry}</span></div></section>
+        <section className="send-card card"><div className="card-header"><div><p className="eyebrow">Send</p><h2>Native ETH</h2></div><span className="asset-token">ETH</span></div><div className="field"><label htmlFor="recipient">Recipient</label><input id="recipient" value={recipient} onChange={(event) => setRecipient(event.target.value)} placeholder="0x1234…" autoComplete="off" spellCheck="false" /></div><div className="field amount-field"><label htmlFor="amount">Amount</label><div className="amount-input"><input id="amount" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00" inputMode="decimal" /><span>ETH</span></div></div><button className="primary-button" disabled={stage !== 'READY' || !recipient || !amount} onClick={() => void sendNative()}>{stage === 'SENDING' ? <><span className="button-spinner" /> Sending</> : <>Review & send <ArrowIcon /></>}</button>{error && <div className="alert compact" role="alert"><strong>Transfer needs attention</strong><span>{error}</span></div>}</section>
+        <aside className="session-card"><div className="session-icon"><Mark /></div><div><p className="eyebrow">Secure session</p><strong>Active until {sessionExpiry}</strong><p>Only this tab holds your temporary key. Closing it requires one new Google sign-in.</p></div></aside>
+      </div>}
+      {userOpHash && <div className="receipt" role="status"><span className="receipt-dot" /> {stage === 'SENDING' || stage === 'ACTIVATING' ? 'UserOperation pending' : 'Latest UserOperation confirmed'} <code>{shortAddress(userOpHash)}</code></div>}
+      {copied && <div className="toast" role="status">Wallet address copied</div>}
+    </section>
+    <footer><span>Unaudited research POC</span><span>Native transfers only in this interface</span></footer>
+  </main>
 }
