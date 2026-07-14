@@ -14,8 +14,11 @@ class FrozenPublicKeyRegistry extends zklogin.PublicKeyRegistry {
 }
 const context = self as unknown as DedicatedWorkerGlobalScope
 context.onmessage = async (event: MessageEvent<Request>) => {
+  const post = (type: string, detail?: unknown) => context.postMessage({ type, detail })
   try {
+    post('phase', 'witness')
     const result = await new zklogin.ZkLogin(new FrozenPublicKeyRegistry()).proveJwt(event.data.jwt, event.data.expectedNonce)
+    post('phase', 'proof')
     if (!result) throw new Error('JWT_OR_NONCE_REJECTED')
     const key = (snapshot.keys as Array<{ hash: string; jwkProof: `0x${string}`[] }>).find((candidate) => candidate.hash.toLowerCase() === result.input.public_key_hash.toLowerCase())
     if (!key) throw new Error('JWK_SNAPSHOT_MISS')

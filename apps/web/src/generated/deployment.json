@@ -1,5 +1,5 @@
 {
-  "generation": 0,
+  "generation": 1,
   "chainId": 84532,
   "entryPointVersion": "0.7",
   "kernelVersion": "0.3.3",
@@ -8,10 +8,13 @@
   "kernelImplementation": "0xd6CEDDe84be40893d153Be9d467CD6aD37875b28",
   "kernelFactory": "0x2577507b78c2008Ff367261CB6285d44ba5eF2E9",
   "kernelMetaFactory": "0xd703aaE79538628d27099B8c4f621bE4CCd142d5",
-  "ultraVerifier": "0x0000000000000000000000000000000000000000",
-  "validator": "0x0000000000000000000000000000000000000000",
-  "googleJwkRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
-  "appId": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "ultraVerifier": "0xD37D6e4e41Be1F05AfDF653777848Ee4Fff8FBc9",
+  "validator": "0xc278E3887c2AF9271C0dd6D422Dd4090Baba5AB1",
+  "googleJwkRoot": "0x32a0b760094a508cd1b3480d9edbc709c05a8317b679764bdaec0494225067cb",
+  "appId": "0xf05440c0d518217b9c71b1f6cf825cc2286d1dfc8ffa8f4c91650d18613c9364",
   "shieldCommit": "31d7030708f7074ec2cf57fe9bb7a024283d50e0",
-  "runtimeCodeHashes": { "ultraVerifier": "0x", "validator": "0x" }
+  "runtimeCodeHashes": {
+    "ultraVerifier": "0xeb6c392c83f806fe97826199d56e3ed3f60b1ecc6e164325afc0caf651f22087",
+    "validator": "0xc2f0d029fd08f877870732e8bf16395c67fe570948906656360ce1dc337c388a"
+  }
 }

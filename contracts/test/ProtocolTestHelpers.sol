@@ -23,10 +23,11 @@ contract StrictMockVerifier is IProofVerifier {
         shouldRevert = shouldRevert_;
     }
 
-    function verify(
-        bytes calldata,
-        bytes32[] calldata publicInputs
-    ) external view returns (bool) {
+    function verify(bytes calldata, bytes32[] calldata publicInputs)
+        external
+        view
+        returns (bool)
+    {
         if (shouldRevert) revert("MOCK_VERIFIER_REVERT");
         return result && keccak256(abi.encode(publicInputs)) == expectedInputsHash;
     }
@@ -34,10 +35,7 @@ contract StrictMockVerifier is IProofVerifier {
 
 /// @dev Models the Kernel calling its installed root validator.
 contract NodeKernelCaller {
-    function install(
-        ZkLoginKernelValidator validator,
-        bytes32 accountId
-    ) external {
+    function install(ZkLoginKernelValidator validator, bytes32 accountId) external {
         validator.onInstall(abi.encode(accountId));
     }
 

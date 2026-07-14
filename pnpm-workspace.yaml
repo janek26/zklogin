@@ -1,3 +1,6 @@
 packages:
   - apps/*
+allowBuilds:
+  bufferutil: set this to true or false
+  utf-8-validate: set this to true or false
 verifyDepsBeforeRun: false
