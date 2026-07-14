@@ -2,6 +2,7 @@ import { GoogleLogin } from '@react-oauth/google'
 import type { Stage } from '../lib/types'
 import type { PreLoginSession } from '../auth/nonce'
 import { ArrowIcon } from './Icons'
+import { config } from '../config'
 
 export function statusHeadline(stage: Stage) {
   if (stage === 'PROVING') return 'Creating your private proof'
@@ -39,7 +40,7 @@ export function Onboarding({
         <h1>{statusHeadline(stage)}</h1>
         <p>
           {stage === 'PROVING' && 'Generating a zero-knowledge proof in your browser. This stays entirely local.'}
-          {stage === 'ACTIVATING' && 'Deploying your smart account on Base Sepolia and activating your session key.'}
+          {stage === 'ACTIVATING' && `Deploying your smart account on ${config.chain.name} and activating your session key.`}
           {stage === 'PREPARING' && 'Generating an ephemeral session key and cryptographic nonce locally.'}
           {stage === 'GOOGLE_READY' && 'Google verifies your identity. A zero-knowledge proof is then created in your browser — nothing leaves this tab.'}
           {stage === 'ERROR' && 'Something went wrong. You can start a new session below.'}

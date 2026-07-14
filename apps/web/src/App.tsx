@@ -174,7 +174,7 @@ export function App() {
       <nav className="topbar" aria-label="Wallet navigation">
         <span className="topbar-title">zkLogin wallet</span>
         <div className="topbar-right">
-          <span className="network-badge"><i /> Base Sepolia</span>
+          <span className="network-badge"><i /> {config.chain.name}</span>
           {wallet && <button className="text-button" onClick={reset}>Disconnect</button>}
         </div>
       </nav>
