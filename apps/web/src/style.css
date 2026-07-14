@@ -53,6 +53,8 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
   gap: 14px;
 }
 
+.topbar .text-button { margin-top: 0; }
+
 .network-badge {
   display: inline-flex;
   align-items: center;
@@ -451,46 +453,68 @@ svg {
   background: #16151d;
   transition: transform .18s ease, background .18s ease, color .18s ease;
 }
+/* Session info */
 
-.icon-button:hover { color: #f2f1f8; background: #24232c; transform: translateY(-1px); }
-
-.primary-button svg, .text-button svg { width: 15px; }
-
-/* Session card */
-
-.session-card {
+.session-info {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 22px;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  height: 100%;
   border: 1px solid #2d2c36;
   border-radius: 18px;
-  background: #1111178c;
+  background: linear-gradient(160deg, #171620, #121118);
 }
 
-.session-icon {
-  width: 35px;
-  height: 35px;
-  flex: 0 0 35px;
-  display: grid;
-  place-items: center;
+.session-info-top {
+  display: flex;
+  align-items: center;
+  gap: 7px;
   color: #a3ed60;
-  border-radius: 10px;
-  background: #23222b;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .03em;
 }
 
-.session-card strong {
-  display: block;
-  margin-bottom: 7px;
-  color: #dedce6;
-  font-size: 13px;
+.session-info-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.session-card p:last-child {
+.session-ring {
+  width: 72px;
+  height: 72px;
+}
+
+.session-ring-track {
+  stroke: #2a2834;
+  stroke-width: 3;
+}
+
+.session-ring-fill {
+  stroke: #a3ed60;
+  stroke-width: 3;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dashoffset .5s linear;
+}
+
+.session-countdown {
+  color: #e8e6f0;
+  font: 500 26px/.95 'DM Mono', monospace;
+  letter-spacing: -.03em;
+}
+
+.session-info p {
   margin: 0;
-  color: #878491;
+  color: #7a7888;
   font-size: 12px;
-  line-height: 1.55;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .receipt {

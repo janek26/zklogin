@@ -76,6 +76,7 @@ export function App() {
   const [proofProgress, setProofProgress] = useState(0)
   const [copied, setCopied] = useState(false)
   const [sending, sendDispatch] = useReducer(sendReducer, false)
+  const [countdown, setCountdown] = useState('')
   const proofStart = useRef(0)
   const unsupported = !window.Worker || !window.WebAssembly || !window.crypto || typeof BigInt === 'undefined'
   const reset = useCallback(() => { sessionStorage.removeItem(READY_KEY); const fresh = createPreLoginSession(); sessionStorage.setItem(PRELOGIN_KEY, JSON.stringify(fresh)); setPreLogin(fresh); setWallet(null); setError(null); setStage('GOOGLE_READY') }, [])
@@ -168,6 +169,21 @@ export function App() {
     }, 100)
     return () => clearInterval(timer)
   }, [stage])
+
+  useEffect(() => {
+    if (!sessionExpiry) return
+    const tick = () => {
+      const rem = sessionExpiry - Math.floor(Date.now() / 1000)
+      if (rem <= 0) { setCountdown('Expired'); return }
+      const h = Math.floor(rem / 3600)
+      const m = Math.floor((rem % 3600) / 60)
+      const s = rem % 60
+      setCountdown(h > 0 ? `${h}h ${m}m ${s}s` : m > 0 ? `${m}m ${s}s` : `${s}s`)
+    }
+    tick()
+    const timer = setInterval(tick, 1000)
+    return () => clearInterval(timer)
+  }, [sessionExpiry])
 
   const copyAddress = useCallback(async () => {
     if (!wallet) return
@@ -327,18 +343,21 @@ export function App() {
                 </div>
               )}
             </section>
-
-            <aside className="session-card">
-              <div className="session-icon">
-                <svg viewBox="0 0 24 24" aria-hidden="true" width="16" height="16">
+            <aside className="session-info">
+              <div className="session-info-top">
+                <svg viewBox="0 0 24 24" aria-hidden="true" width="13" height="13">
                   <path d="M12 2a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v3h6V7a3 3 0 0 0-3-3z" fill="currentColor" />
                 </svg>
+                Session key active
               </div>
-              <div>
-                <p className="eyebrow">Secure session</p>
-                <strong>Active until {formatExpiry(sessionExpiry)}</strong>
-                <p>Only this tab holds your temporary key. Closing it requires a new sign-in.</p>
+              <div className="session-info-body">
+                <svg className="session-ring" viewBox="0 0 40 40" aria-hidden="true">
+                  <circle className="session-ring-track" cx="20" cy="20" r="16" fill="none" />
+                  <circle className="session-ring-fill" cx="20" cy="20" r="16" fill="none" strokeDasharray={100} strokeDashoffset={100 * (1 - Math.max(1, Math.min(99, Math.round(((sessionExpiry - Math.floor(Date.now() / 1000)) / 86400) * 100))) / 100)} strokeLinecap="round" />
+                </svg>
+                <div className="session-countdown">{countdown || '—'}</div>
               </div>
+              <p>Only this browser tab holds your temporary key. Closing it requires a new Google sign-in.</p>
             </aside>
           </div>
         )}
@@ -355,7 +374,7 @@ export function App() {
       )}
       {copied && <div className="toast" role="status">Address copied</div>}
 
-      <footer>Unaudited research POC &middot; Native transfers only</footer>
+      <footer>Unaudited research POC</footer>
     </main>
   )
 }
