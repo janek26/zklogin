@@ -1,12 +1,11 @@
 import { readFile } from 'node:fs/promises'
 import { createPublicClient, getAddress, http, keccak256 } from 'viem'
-import { baseSepolia } from 'viem/chains'
+import { megaethTestnet } from 'viem/chains'
 
-const rpcUrl = process.env.BASE_SEPOLIA_RPC_URL
-if (!rpcUrl) throw new Error('BASE_SEPOLIA_RPC_URL is required')
-const deployment = JSON.parse(await readFile(new URL('../apps/web/src/generated/deployment.json', import.meta.url)))
-if (deployment.generation < 1) throw new Error('deployment.json is a template')
-const client = createPublicClient({ chain: baseSepolia, transport: http(rpcUrl) })
+const rpcUrl = process.env.MEGAETH_TESTNET_RPC_URL ?? 'https://carrot.megaeth.com/rpc'
+const deployment = JSON.parse(await readFile(new URL('../apps/web/src/generated/deployment-megaeth.json', import.meta.url)))
+if (deployment.generation < 1) throw new Error('deployment-megaeth.json is a template')
+const client = createPublicClient({ chain: megaethTestnet, transport: http(rpcUrl) })
 const addresses = {
   entryPoint: deployment.entryPoint,
   kernelImplementation: deployment.kernelImplementation,

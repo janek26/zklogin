@@ -1,6 +1,6 @@
 import { getAddress, isAddress, isHex, size, zeroAddress, zeroHash } from 'viem'
-import { baseSepolia } from 'viem/chains'
-import deployment from './generated/deployment.json'
+import { megaethTestnet } from 'viem/chains'
+import deployment from './generated/deployment-megaeth.json'
 
 function required(name: string): string {
   const value = import.meta.env[name]
@@ -22,17 +22,17 @@ function deployedAddress(name: string, value: string) {
   return getAddress(value)
 }
 
-if (deployment.generation < 1 || deployment.chainId !== 84532) {
+if (deployment.generation < 1 || deployment.chainId !== 6343) {
   throw new Error('Invalid or template deployment generation')
 }
 
 const projectId = required('VITE_ZERODEV_PROJECT_ID')
 
 export const config = Object.freeze({
-  chain: baseSepolia,
-  chainId: 84532,
-  publicRpcUrl: required('VITE_BASE_SEPOLIA_RPC_URL'),
-  zeroDevRpcUrl: `https://rpc.zerodev.app/api/v3/${projectId}/chain/84532`,
+  chain: megaethTestnet,
+  chainId: 6343,
+  publicRpcUrl: required('VITE_MEGAETH_TESTNET_RPC_URL'),
+  zeroDevRpcUrl: `https://rpc.zerodev.app/api/v3/${projectId}/chain/6343`,
   googleClientId: required('VITE_GOOGLE_CLIENT_ID'),
   validatorAddress: deployedAddress('validator', deployment.validator),
   ultraVerifierAddress: deployedAddress('ultraVerifier', deployment.ultraVerifier),
