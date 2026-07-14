@@ -2,7 +2,7 @@ node_modules/
 dist/
 coverage/
 .env.local
-contracts/.env
+contracts/.env*
 contracts/out/
 contracts/cache/
 contracts/broadcast/
