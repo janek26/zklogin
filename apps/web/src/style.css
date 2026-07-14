@@ -55,6 +55,14 @@ button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid 
 
 .topbar .text-button { margin-top: 0; }
 
+.github-badge {
+  display: inline-flex;
+  align-items: center;
+  color: #777482;
+  transition: color .15s;
+}
+.github-badge:hover { color: #b6b3c4; }
+
 .network-badge {
   display: inline-flex;
   align-items: center;
