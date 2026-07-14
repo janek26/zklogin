@@ -33,7 +33,7 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: production
+      name: prod
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
