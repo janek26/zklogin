@@ -11,7 +11,7 @@ export function proveInBrowser(
   const { promise, resolve, reject } = Promise.withResolvers<BrowserProof>()
   let settled = false
   const fail = (reason: string) => { if (settled) return; settled = true; window.clearTimeout(timeout); worker.terminate(); reject(new Error(reason)) }
-  const timeout = window.setTimeout(() => fail('PROVING_TIMEOUT'), 25_000)
+  const timeout = window.setTimeout(() => fail('PROVING_TIMEOUT'), 5 * 60_000)
 
   worker.onmessage = (event) => {
     if (event.data.type === 'phase') {

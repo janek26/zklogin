@@ -131,7 +131,7 @@ export function App() {
     proofStart.current = Date.now()
     setProofProgress(0)
     const timer = setInterval(() => {
-      const t = Math.min((Date.now() - proofStart.current) / 80_000, 1)
+      const t = Math.min((Date.now() - proofStart.current) / 25_000, 1)
       setProofProgress(0.95 * (1 - (1 - t) ** 3))
     }, 100)
     return () => clearInterval(timer)
