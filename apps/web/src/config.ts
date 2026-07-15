@@ -1,5 +1,5 @@
 import { getAddress, isAddress, isHex, size, zeroAddress, zeroHash } from 'viem'
-// Google OAuth client ID from VITE_GOOGLE_CLIENT_ID env var at build time
+// Google OAuth client ID — set via VITE_GOOGLE_CLIENT_ID at build time
 import { megaethTestnet } from 'viem/chains'
 import deployment from './generated/deployment-megaeth.json'
 
