@@ -59,6 +59,35 @@ pnpm verify:deployment  # on-chain contract audit
 
 ## License
 
-Written license clarification from Shield Labs required before copying,
-modifying, or redistributing Shield source (`@shield-labs/zklogin`,
-`@shield-labs/zklogin-contracts`).
+This project's own code (everything under `apps/web/src/`, `contracts/src/`,
+`scripts/`, and `.github/`) is licensed under the **MIT License** — see
+[LICENSE](LICENSE).
+
+### Dependency licenses
+
+| Package | License |
+|---|---|
+| `@react-oauth/google` | MIT |
+| `@shield-labs/zklogin` | MIT (registry; no LICENSE file in repo) |
+| `@shield-labs/zklogin-contracts` | MIT (registry; no LICENSE file in repo) |
+| `@zerodev/sdk` | MIT |
+| `@noir-lang/acvm_js` | MIT |
+| `@noir-lang/noirc_abi` | MIT OR Apache-2.0 |
+| `@openzeppelin/contracts` | MIT |
+| `@openzeppelin/merkle-tree` | MIT |
+| `jose` | MIT |
+| `react` / `react-dom` | MIT |
+| `viem` | MIT |
+| `@vitejs/plugin-react` | MIT |
+| `typescript` | Apache-2.0 |
+| `vite` | MIT |
+| `vitest` | MIT |
+| `ethers` | MIT |
+| `ganache` | MIT |
+| `playwright` | Apache-2.0 |
+| `solc` | MIT |
+| `@aztec/bb.js` | MIT |
+
+Shield Labs packages (`@shield-labs/zklogin`, `@shield-labs/zklogin-contracts`)
+are listed as MIT on the npm registry but do not include a `LICENSE` file in
+their repository. All other dependencies carry unambiguous open-source licenses.
