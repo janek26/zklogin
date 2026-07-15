@@ -1,5 +1,6 @@
 /*
-  Document-Isolation-Policy: isolate-and-credentialless
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: require-corp
   Permissions-Policy: cross-origin-isolated=(self)
   Cache-Control: public, max-age=0, must-revalidate
   X-Content-Type-Options: nosniff

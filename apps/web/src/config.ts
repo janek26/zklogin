@@ -1,10 +1,8 @@
 import { getAddress, isAddress, isHex, size, zeroAddress, zeroHash } from 'viem'
-// Google OAuth client ID — set via VITE_GOOGLE_CLIENT_ID at build time
 import { megaethTestnet } from 'viem/chains'
 import deployment from './generated/deployment-megaeth.json'
 
-function required(name: string): string {
-  const value = import.meta.env[name]
+function envReq(name: string, value: string | undefined): string {
   if (!value) throw new Error(`Missing configuration: ${name}`)
   return value
 }
@@ -27,16 +25,23 @@ if (deployment.generation < 1 || deployment.chainId !== 6343) {
   throw new Error('Invalid or template deployment generation')
 }
 
-const projectId = required('VITE_ZERODEV_PROJECT_ID')
+// Use direct import.meta.env.VITE_* access — Vite 8/Rolldown only inlines dot notation, not bracket/computed.
+const googleClientId = envReq('VITE_GOOGLE_CLIENT_ID', import.meta.env.VITE_GOOGLE_CLIENT_ID)
+const zeroDevProjectId = envReq('VITE_ZERODEV_PROJECT_ID', import.meta.env.VITE_ZERODEV_PROJECT_ID)
+const rpcUrl = envReq('VITE_MEGAETH_TESTNET_RPC_URL', import.meta.env.VITE_MEGAETH_TESTNET_RPC_URL)
+const redirectUrl = import.meta.env.VITE_REDIRECT_URL
 
 export const config = Object.freeze({
   chain: megaethTestnet,
   chainId: 6343,
-  publicRpcUrl: required('VITE_MEGAETH_TESTNET_RPC_URL'),
-  zeroDevRpcUrl: `https://rpc.zerodev.app/api/v3/${projectId}/chain/6343`,
-  googleClientId: required('VITE_GOOGLE_CLIENT_ID'),
+  publicRpcUrl: rpcUrl,
+  zeroDevRpcUrl: `https://rpc.zerodev.app/api/v3/${zeroDevProjectId}/chain/6343`,
+  googleClientId,
   validatorAddress: deployedAddress('validator', deployment.validator),
   ultraVerifierAddress: deployedAddress('ultraVerifier', deployment.ultraVerifier),
   jwkRoot: bytes32('googleJwkRoot', deployment.googleJwkRoot),
   appId: bytes32('appId', deployment.appId),
+  redirectOrigin: (redirectUrl && redirectUrl !== 'window.location.origin')
+    ? redirectUrl
+    : window.location.origin,
 })

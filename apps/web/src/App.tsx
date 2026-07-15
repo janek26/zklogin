@@ -14,6 +14,7 @@ import { shortAddress, requireBytes32, READY_KEY, PRELOGIN_KEY } from './lib/uti
 import { loadOrCreatePreLogin, assertActivated } from './lib/session'
 import type { PreLoginSession } from './auth/nonce'
 import { proveInBrowser } from './auth/prove'
+import { parseIdTokenFromFragment, clearFragment } from './auth/googleOAuth'
 
 export function App() {
   const [stage, setStage] = useState<Stage>('PREPARING')
@@ -31,6 +32,7 @@ export function App() {
   const [countdown, setCountdown] = useState('')
   const [spinning, setSpinning] = useState(false)
   const proofStart = useRef(0)
+  const oauthHandled = useRef(false)
   const unsupported = !window.Worker || !window.WebAssembly || !window.crypto || typeof BigInt === 'undefined'
   const isMobile = (navigator.maxTouchPoints > 1 && window.matchMedia('(pointer: coarse)').matches)
     || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
@@ -101,6 +103,17 @@ function estimateProofMs(): number {
       sessionStorage.removeItem(PRELOGIN_KEY); setWallet(created); setSessionExpiry(session.sessionValidUntil); await refreshBalance(created.account.address); setStage('READY')
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'LOGIN_FAILED'); setStage('ERROR') }
   }, [refreshBalance])
+
+  // OAuth redirect callback — parses id_token from URL fragment after Google redirects back.
+  // Gated on stage reaching GOOGLE_READY (restore effect ran, no saved session).
+  useEffect(() => {
+    if (oauthHandled.current || stage !== 'GOOGLE_READY') return
+    const jwt = parseIdTokenFromFragment()
+    if (!jwt) return
+    oauthHandled.current = true
+    clearFragment()
+    void completeGoogleLogin(jwt, preLogin)
+  }, [stage, preLogin, completeGoogleLogin])
 
   const doSend = useCallback(async () => {
     if (!wallet || sending) return
@@ -225,8 +238,6 @@ function estimateProofMs(): number {
             preLogin={preLogin}
             error={error}
             proofProgress={proofProgress}
-            onGoogleSuccess={(credential) => { void completeGoogleLogin(credential, preLogin) }}
-            onGoogleError={() => setError('GOOGLE_LOGIN_FAILED')}
             onReset={reset}
           />
         )}

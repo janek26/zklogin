@@ -1,0 +1,13 @@
+<!doctype html>
+<html><head><meta charset="UTF-8" /></head>
+<body>
+<h1 id="out">checking...</h1>
+<script>
+document.getElementById('out').textContent = JSON.stringify({
+  crossOriginIsolated: window.crossOriginIsolated,
+  sharedArrayBuffer: typeof SharedArrayBuffer !== 'undefined',
+  userAgent: navigator.userAgent,
+  hardwareConcurrency: navigator.hardwareConcurrency,
+})
+</script>
+</body></html>

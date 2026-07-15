@@ -57,6 +57,7 @@ jobs:
           NODE_ENV: production
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_ZERODEV_PROJECT_ID: ${{ secrets.VITE_ZERODEV_PROJECT_ID }}
+          VITE_REDIRECT_URL: https://zklogin-poc.rahrt.com
           VITE_MEGAETH_TESTNET_RPC_URL: https://carrot.megaeth.com/rpc
       - name: Install and run Wrangler
         run: |
@@ -87,6 +88,7 @@ jobs:
           NODE_ENV: production
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_ZERODEV_PROJECT_ID: ${{ secrets.VITE_ZERODEV_PROJECT_ID }}
+          VITE_REDIRECT_URL: window.location.origin
           VITE_MEGAETH_TESTNET_RPC_URL: https://carrot.megaeth.com/rpc
       - name: Deploy preview
         id: deploy
@@ -95,23 +97,45 @@ jobs:
           OUT=$(wrangler pages deploy apps/web/dist --project-name=zklogin-poc --branch="${{ steps.branch.outputs.name }}" 2>&1)
           printf '%s\n' "$OUT"
           URL=$(printf '%s\n' "$OUT" | grep -oP 'https://[\w.-]+\.pages\.dev' | head -1)
+          ALIAS=$(printf '%s\n' "$OUT" | grep -oP 'https://[\w.-]+\.pages\.dev' | tail -1)
           printf 'url=%s\n' "$URL" >> "$GITHUB_OUTPUT"
+          printf 'alias=%s\n' "$ALIAS" >> "$GITHUB_OUTPUT"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - name: Comment preview URL
+      - name: Update PR comment with preview URL
         uses: actions/github-script@v7
         with:
           script: |
-            github.rest.issues.createComment({
+            const body = [
+              '## Preview Deployment',
+              '',
+              `:link: **Stable URL**: ${{ steps.deploy.outputs.alias }}`,
+              `:hash: Latest deploy: ${{ steps.deploy.outputs.url }}`,
+              '',
+              '> :warning: Google Sign-In may not work on preview URLs unless the origin is registered in the Google Cloud Console (Authorized JavaScript Origins + Redirect URIs).',
+            ].join('\n')
+
+            // Find and update existing bot comment, or create new one
+            const { data: comments } = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: [
-                '## Preview Deployment',
-                '',
-                `:link: **URL**: ${{ steps.deploy.outputs.url }}`,
-                '',
-                '> :warning: Google Sign-In may not work on preview URLs unless `*.zklogin-poc.pages.dev` is authorized in the Google Cloud Console under Authorized JavaScript Origins.',
-              ].join('\n')
             })
+            const botComment = comments.find(c => c.user.type === 'Bot' && c.body.includes('Preview Deployment'))
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              })
+            } else {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body,
+              })
+            }
