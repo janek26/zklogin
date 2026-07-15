@@ -1,9 +1,25 @@
+/**
+ * COI Test Server — serves the built app with COOP/COEP headers for local testing.
+ *
+ * Usage:
+ *   pnpm build                         # build the app first
+ *   node scripts/serve-coi.mjs         # serves at http://localhost:8787
+ *
+ * Test pages:
+ *   /                  — main app (COI headers)
+ *   /coi-test.html     — minimal page that only checks crossOriginIsolated
+ *
+ * The coi-test.html is served from scripts/ (not public/) so it never
+ * gets deployed to production. It's only available via this dev server.
+ */
+
 import http from 'node:http'
 import fs from 'node:fs'
 import path from 'node:path'
 
 const PORT = 8787
-const DIR = 'apps/web/dist'
+const DIST = 'apps/web/dist'
+const SCRIPTS = 'scripts'
 
 const mime = {
   '.html': 'text/html; charset=utf-8',
@@ -15,15 +31,11 @@ const mime = {
   '.png': 'image/png',
 }
 
-http.createServer((req, res) => {
-  const filePath = path.join(DIR, req.url === '/' ? '/index.html' : req.url)
+function serveFile(res, filePath) {
   const ext = path.extname(filePath)
-  
-  // All responses get COOP/COEP
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
   res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp')
   res.setHeader('Permissions-Policy', 'cross-origin-isolated=(self)')
-  
   try {
     const data = fs.readFileSync(filePath)
     res.setHeader('Content-Type', mime[ext] || 'application/octet-stream')
@@ -31,5 +43,14 @@ http.createServer((req, res) => {
   } catch {
     res.statusCode = 404
     res.end('Not found')
+  }
+}
+
+http.createServer((req, res) => {
+  const url = new URL(req.url, `http://localhost:${PORT}`).pathname
+  if (url === '/coi-test.html') {
+    serveFile(res, path.join(SCRIPTS, 'coi-test.html'))
+  } else {
+    serveFile(res, path.join(DIST, url === '/' ? '/index.html' : url))
   }
 }).listen(PORT, () => console.log(`http://localhost:${PORT}`))
