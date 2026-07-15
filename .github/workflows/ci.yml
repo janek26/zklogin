@@ -57,6 +57,7 @@ jobs:
           NODE_ENV: production
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_ZERODEV_PROJECT_ID: ${{ secrets.VITE_ZERODEV_PROJECT_ID }}
+          VITE_REDIRECT_URL: https://zklogin-poc.rahrt.com
           VITE_MEGAETH_TESTNET_RPC_URL: https://carrot.megaeth.com/rpc
       - name: Install and run Wrangler
         run: |
@@ -87,6 +88,7 @@ jobs:
           NODE_ENV: production
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_ZERODEV_PROJECT_ID: ${{ secrets.VITE_ZERODEV_PROJECT_ID }}
+          VITE_REDIRECT_URL: window.location.origin
           VITE_MEGAETH_TESTNET_RPC_URL: https://carrot.megaeth.com/rpc
       - name: Deploy preview
         id: deploy

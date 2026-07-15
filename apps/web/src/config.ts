@@ -39,4 +39,8 @@ export const config = Object.freeze({
   ultraVerifierAddress: deployedAddress('ultraVerifier', deployment.ultraVerifier),
   jwkRoot: bytes32('googleJwkRoot', deployment.googleJwkRoot),
   appId: bytes32('appId', deployment.appId),
+  redirectOrigin: (() => {
+    const env = import.meta.env.VITE_REDIRECT_URL
+    return (env && env !== 'window.location.origin') ? env : window.location.origin
+  })(),
 })

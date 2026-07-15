@@ -82,7 +82,8 @@ export function Onboarding({
         <div className="google-slot">
           <GoogleLogin
             nonce={preLogin.googleNonce}
-            use_fedcm_for_button={true}
+            ux_mode="redirect"
+            login_uri={config.redirectOrigin}
             theme="outline"
             shape="pill"
             size="large"
