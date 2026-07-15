@@ -40,7 +40,7 @@ function estimateProofMs(): number {
   // Multithreaded: 18 threads observed at ~7s warm / ~23s cold.
   // Single-threaded (no COI): observed ~47-67s.
   if (window.crossOriginIsolated) return Math.round(25_000 * Math.min(18, threads * 1.4) / threads)
-  return 60_000
+  return 90_000
 }
 
   const reset = useCallback(() => {
