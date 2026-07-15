@@ -83,7 +83,6 @@ export function Onboarding({
           <GoogleLogin
             nonce={preLogin.googleNonce}
             use_fedcm_for_button={true}
-            ux_mode="redirect"
             theme="outline"
             shape="pill"
             size="large"
