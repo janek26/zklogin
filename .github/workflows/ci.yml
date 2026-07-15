@@ -41,11 +41,14 @@ jobs:
         with: { version: 11.12.0 }
       - name: Validate secrets
         run: |
-          if [ -z "$VITE_GOOGLE_CLIENT_ID" ]; then echo "MISSING: VITE_GOOGLE_CLIENT_ID"; exit 1; fi
-          if [ -z "$VITE_ZERODEV_PROJECT_ID" ]; then echo "MISSING: VITE_ZERODEV_PROJECT_ID"; exit 1; fi
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then echo "MISSING: CLOUDFLARE_API_TOKEN"; exit 1; fi
-          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then echo "MISSING: CLOUDFLARE_ACCOUNT_ID"; exit 1; fi
-          echo "All secrets present"
+          fail() { echo "MISSING: $1"; exit 1; }
+          [ -n "$VITE_GOOGLE_CLIENT_ID" ] || fail VITE_GOOGLE_CLIENT_ID
+          echo "$VITE_GOOGLE_CLIENT_ID" | grep -qF '.apps.googleusercontent.com' || fail 'VITE_GOOGLE_CLIENT_ID (not a Google client ID)'
+          [ -n "$VITE_ZERODEV_PROJECT_ID" ] || fail VITE_ZERODEV_PROJECT_ID
+          echo "$VITE_ZERODEV_PROJECT_ID" | grep -qE '^[0-9a-f-]{36}$' || fail 'VITE_ZERODEV_PROJECT_ID (not a UUID)'
+          [ -n "$CLOUDFLARE_API_TOKEN" ] || fail CLOUDFLARE_API_TOKEN
+          [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || fail CLOUDFLARE_ACCOUNT_ID
+          echo "All secrets present and valid"
         env:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_ZERODEV_PROJECT_ID: ${{ secrets.VITE_ZERODEV_PROJECT_ID }}
