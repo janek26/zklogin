@@ -1,5 +1,8 @@
 name: verify
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 jobs:
   web:
     runs-on: ubuntu-latest
@@ -139,3 +142,51 @@ jobs:
                 body,
               })
             }
+
+
+  # Clean up preview deployment when PR is closed or merged
+  cleanup-preview:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Sanitize branch name
+        id: branch
+        run: printf 'name=%s\n' "$(printf '%s' '${{ github.head_ref }}' | sed 's|/|-|g')" >> "$GITHUB_OUTPUT"
+      - name: Delete Cloudflare Pages preview deployment
+        run: |
+          # Find deployment ID for this branch, then delete it
+          BRANCH="${{ steps.branch.outputs.name }}"
+          echo "Cleaning up preview deployment for branch: $BRANCH"
+
+          # List deployments and find matching branch alias.
+          # Cloudflare truncates branch aliases to ~30 chars, so match by prefix.
+          DEPLOYMENTS=$(curl -s -X GET \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/zklogin-poc/deployments" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN")
+
+          # Find deployment IDs — Cloudflare may truncate branch names to ~28 chars.
+          # Match by prefix: the first 28 chars of the sanitized branch name.
+          PREFIX=$(printf '%.28s' "$BRANCH")
+          IDS=$(echo "$DEPLOYMENTS" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for d in data.get('result', []):
+    alias = d.get('deployment_trigger', {}).get('metadata', {}).get('branch', '')
+    if alias.startswith('$PREFIX'):
+        print(d['id'])
+")
+
+          for id in $IDS; do
+            echo "Deleting deployment: $id"
+            curl -s -X DELETE \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/zklogin-poc/deployments/$id" \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -o /dev/null -w "  Status: %{http_code}\n"
+          done
+
+          echo "Cleanup complete"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
