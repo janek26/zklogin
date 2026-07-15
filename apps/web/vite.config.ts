@@ -12,7 +12,8 @@ export default defineConfig(({ mode }) => ({
   worker: { format: 'es' },
   server: process.env.BENCH_COI === '1' ? {
     headers: {
-      'Document-Isolation-Policy': 'isolate-and-credentialless',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
     },
   } : undefined,
 }))
