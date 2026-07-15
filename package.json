@@ -25,6 +25,7 @@
     "@shield-labs/zklogin": "0.6.1",
     "ethers": "6.16.0",
     "ganache": "7.9.2",
+    "playwright": "^1.61.1",
     "solc": "0.8.30",
     "viem": "2.55.1"
   },
