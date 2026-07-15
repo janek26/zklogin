@@ -191,7 +191,11 @@ function estimateProofMs(): number {
     )
   }
 
-  if (isMobile) {
+  const [mobileDisclaimerDismissed, setMobileDisclaimerDismissed] = useState(
+    () => sessionStorage.getItem('zklogin.mobile-disclaimer') === '1'
+  )
+
+  if (isMobile && !mobileDisclaimerDismissed) {
     return (
       <main className="app-shell">
         <section className="desktop-only card">
@@ -202,15 +206,33 @@ function estimateProofMs(): number {
               <line x1="12" y1="17" x2="12" y2="21"/>
             </svg>
           </div>
-          <h1>Desktop only</h1>
+          <h1>Desktop intended</h1>
           <p>
             This wallet generates zero-knowledge proofs entirely in your browser.
-            That requires significant memory and multiple CPU threads — resources
-            not yet available on mobile devices.
+            That requires significant memory and parallel CPU threads &mdash;
+            resources most mobile devices cannot reliably provide.
           </p>
-          <p className="desktop-only-hint">
-            Open this page on a desktop or laptop to continue.
-          </p>
+          <div className="desktop-only-details">
+            <p>
+              <strong>What to expect on mobile:</strong> Proof generation may
+              silently crash or reload the page under memory pressure, especially
+              on iOS. The app remains accessible for viewing your wallet, but
+              proving is likely to fail.
+            </p>
+            <p>
+              <strong>Tested on:</strong> Safari on macOS &middot; Chrome on macOS.
+              Desktop or laptop strongly recommended.
+            </p>
+          </div>
+          <button
+            className="text-button desktop-only-dismiss"
+            onClick={() => {
+              sessionStorage.setItem('zklogin.mobile-disclaimer', '1')
+              setMobileDisclaimerDismissed(true)
+            }}
+          >
+            I understand, continue anyway
+          </button>
         </section>
       </main>
     )

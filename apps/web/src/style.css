@@ -676,6 +676,31 @@ svg {
   color: #6b6978 !important;
 }
 
+.desktop-only-details {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #2a2933;
+  text-align: left;
+}
+.desktop-only-details p {
+  font-size: 13px !important;
+  color: #8a8898 !important;
+  margin-bottom: 10px;
+}
+.desktop-only-details p:last-child {
+  margin-bottom: 0;
+}
+.desktop-only-details strong {
+  color: #c8c6d4;
+  font-weight: 600;
+}
+
+.desktop-only-dismiss {
+  margin-top: 22px !important;
+  width: 100%;
+  justify-content: center;
+}
+
 /* Keyframes */
 
 @keyframes spin { to { transform: rotate(360deg); } }
