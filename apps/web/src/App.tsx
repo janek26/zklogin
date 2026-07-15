@@ -35,6 +35,14 @@ export function App() {
   const isMobile = (navigator.maxTouchPoints > 1 && window.matchMedia('(pointer: coarse)').matches)
     || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
 
+function estimateProofMs(): number {
+  const threads = navigator.hardwareConcurrency || 4
+  // Multithreaded: 18 threads observed at ~7s warm / ~23s cold.
+  // Single-threaded (no COI): observed ~47-67s.
+  if (window.crossOriginIsolated) return Math.round(25_000 * Math.min(18, threads * 1.4) / threads)
+  return 60_000
+}
+
   const reset = useCallback(() => {
     sessionStorage.removeItem(READY_KEY)
     const fresh = loadOrCreatePreLogin()
@@ -129,9 +137,9 @@ export function App() {
   useEffect(() => {
     if (stage !== 'PROVING') { setProofProgress(0); return }
     proofStart.current = Date.now()
-    setProofProgress(0)
+    const target = estimateProofMs()
     const timer = setInterval(() => {
-      const t = Math.min((Date.now() - proofStart.current) / 25_000, 1)
+      const t = Math.min((Date.now() - proofStart.current) / target, 1)
       setProofProgress(0.95 * (1 - (1 - t) ** 3))
     }, 100)
     return () => clearInterval(timer)
