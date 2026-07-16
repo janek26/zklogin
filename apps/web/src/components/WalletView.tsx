@@ -1,9 +1,10 @@
-import type { Hex } from 'viem'
+import type { Address, Hex } from 'viem'
 import { formatEther } from 'viem'
 import type { Wallet } from '../lib/types'
 import { shortAddress, formatExpiry } from '../lib/utils'
 import { config } from '../config'
 import { ArrowIcon, CopyIcon, RefreshIcon } from './Icons'
+import { OnrampCard } from '../onramp/OnrampCard'
 
 export function WalletView({
   wallet,
@@ -13,6 +14,7 @@ export function WalletView({
   error,
   userOpHash,
   sessionExpiry,
+  sessionPrivateKey,
   countdown,
   sending,
   spinning,
@@ -31,9 +33,10 @@ export function WalletView({
   userOpHash: Hex | null
   sessionExpiry: number
   countdown: string
+  sessionPrivateKey: Hex | null
+  canSend: boolean
   sending: boolean
   spinning: boolean
-  canSend: boolean
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
   onCopyAddress: () => void
@@ -112,6 +115,14 @@ export function WalletView({
         </div>
         <p>Only this browser tab holds your temporary key. Closing it requires a new Google sign-in.</p>
       </aside>
+
+      {sessionPrivateKey !== null && (
+        <OnrampCard
+          walletAddress={wallet.account.address}
+          sessionPrivateKey={sessionPrivateKey}
+          collapsed={balance > 0n}
+        />
+      )}
     </div>
   )
 }

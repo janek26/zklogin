@@ -27,6 +27,7 @@ export function App() {
   const [userOpHash, setUserOpHash] = useState<Hex | null>(null)
   const [sessionExpiry, setSessionExpiry] = useState(0)
   const [proofProgress, setProofProgress] = useState(0)
+  const [sessionPrivateKey, setSessionPrivateKey] = useState<Hex | null>(null)
   const [copied, setCopied] = useState(false)
   const [sending, sendDispatch] = useReducer(sendReducer, false)
   const [countdown, setCountdown] = useState('')
@@ -75,7 +76,7 @@ function estimateProofMs(): number {
         const restored = await createWalletClients(validator)
         if (restored.account.address.toLowerCase() !== stored.kernelAddress.toLowerCase()) throw new Error('KERNEL_ADDRESS_DERIVATION_MISMATCH')
         await assertActivated({ kernel: restored.account.address, accountId: stored.accountId, sessionKey: signer.address, validUntil: stored.validUntil })
-        if (!cancelled) { setWallet(restored); setSessionExpiry(stored.validUntil); await refreshBalance(restored.account.address); setStage('READY') }
+        if (!cancelled) { setWallet(restored); setSessionExpiry(stored.validUntil); setSessionPrivateKey(stored.privateKey); await refreshBalance(restored.account.address); setStage('READY') }
       } catch { if (!cancelled) reset() }
     }
     void restore(); return () => { cancelled = true }
@@ -100,7 +101,7 @@ function estimateProofMs(): number {
       setStage('ACTIVATING'); const hash = await created.kernelClient.sendUserOperation({ callData: activationCallData }); setUserOpHash(hash); await waitForSuccess(created.kernelClient, hash)
       await assertActivated({ kernel: created.account.address, accountId: browserProof.accountId, sessionKey: signer.address, validUntil: session.sessionValidUntil })
       sessionStorage.setItem(READY_KEY, JSON.stringify({ version: 1, privateKey: session.privateKey, sessionKey: signer.address, validUntil: session.sessionValidUntil, randomness: session.randomness, accountId: browserProof.accountId, kernelAddress: created.account.address }))
-      sessionStorage.removeItem(PRELOGIN_KEY); setWallet(created); setSessionExpiry(session.sessionValidUntil); await refreshBalance(created.account.address); setStage('READY')
+      sessionStorage.removeItem(PRELOGIN_KEY); setWallet(created); setSessionPrivateKey(session.privateKey); setSessionExpiry(session.sessionValidUntil); await refreshBalance(created.account.address); setStage('READY')
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'LOGIN_FAILED'); setStage('ERROR') }
   }, [refreshBalance])
 
@@ -277,6 +278,7 @@ function estimateProofMs(): number {
             sending={sending}
             spinning={spinning}
             canSend={canSend}
+            sessionPrivateKey={sessionPrivateKey}
             onRecipientChange={setRecipient}
             onAmountChange={setAmount}
             onCopyAddress={() => { void copyAddress() }}

@@ -723,3 +723,330 @@ svg {
 @media (prefers-reduced-motion: reduce) {
   * { animation-duration: .01ms !important; }
 }
+
+/* Onramp */
+
+.onramp-card {
+  padding: 25px;
+  margin-top: 24px;
+  animation: enter .35s ease-out;
+}
+
+.onramp-ext-install,
+.onramp-ext-connect {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 0 8px;
+  gap: 16px;
+}
+
+.onramp-ext-icon {
+  margin-bottom: 4px;
+}
+
+.onramp-ext-install h3,
+.onramp-ext-connect h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e2e0eb;
+  margin: 0;
+}
+
+.onramp-ext-install p,
+.onramp-ext-connect p {
+  font-size: 13px;
+  color: #88859a;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 360px;
+}
+
+.onramp-ext-install p strong,
+.onramp-ext-connect p strong {
+  color: #b6b3c4;
+}
+
+.onramp-provider-btn.is-unavailable {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.onramp-provider-btn.is-unavailable:hover {
+  background: rgba(255, 255, 255, .04);
+  border-color: rgba(255, 255, 255, .06);
+}
+
+.onramp-provider-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .06);
+  font-size: 10px;
+  font-weight: 500;
+  color: #6b6778;
+  vertical-align: middle;
+}
+
+.onramp-ext-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b6778;
+}
+
+.onramp-ext-features li::before {
+  content: '\2713\00a0';
+  color: #b6ff6e;
+}
+
+.onramp-ext-install .primary-button,
+.onramp-ext-connect .primary-button {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.onramp-ext-install .text-button,
+.onramp-ext-connect .text-button {
+  font-size: 13px;
+}
+
+.onramp-card.is-collapsed {
+  padding: 12px 20px;
+}
+
+.onramp-collapsed-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: #88859a;
+  font-size: 14px;
+  text-align: left;
+  transition: color .15s ease;
+}
+
+.onramp-collapsed-trigger:hover {
+  color: #b6ff6e;
+}
+
+.onramp-collapsed-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(182, 255, 110, .1);
+  color: #b6ff6e;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.onramp-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(182, 255, 110, .1);
+  color: #b6ff6e;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+.onramp-country {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: #88859a;
+}
+
+.onramp-country-flag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.onramp-chain-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #6b6778;
+  line-height: 1.4;
+}
+
+.onramp-providers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.onramp-provider-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .06);
+  color: #e2e0eb;
+  text-align: left;
+  transition: background .15s ease, border-color .15s ease;
+}
+
+.onramp-provider-btn:hover {
+  background: rgba(182, 255, 110, .06);
+  border-color: rgba(182, 255, 110, .15);
+}
+
+.onramp-provider-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.onramp-provider-desc {
+  font-size: 12px;
+  color: #88859a;
+}
+
+.onramp-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.onramp-amount-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 14px 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .04);
+  color: #e2e0eb;
+  font-size: 18px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, .06);
+  transition: background .15s ease, border-color .15s ease, transform .1s ease;
+}
+
+.onramp-amount-btn:hover {
+  background: rgba(182, 255, 110, .08);
+  border-color: rgba(182, 255, 110, .2);
+}
+
+.onramp-amount-btn:active {
+  transform: scale(.97);
+}
+
+.onramp-back {
+  width: 100%;
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.onramp-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  color: #aaa8b8;
+  font-size: 15px;
+}
+
+.onramp-confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 28px;
+  gap: 14px;
+}
+
+.onramp-quote {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.onramp-quote-label {
+  font-size: 13px;
+  color: #88859a;
+  letter-spacing: .03em;
+}
+
+.onramp-quote-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #e2e0eb;
+}
+
+.onramp-quote-chain {
+  font-size: 12px;
+  color: #ffc107;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.onramp-arrow {
+  font-size: 20px;
+  color: #b6ff6e;
+}
+
+.onramp-buy-btn {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.onramp-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 28px;
+  gap: 12px;
+}
+
+.onramp-done p {
+  color: #b6ff6e;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.onramp-tx-link {
+  color: #aaa8b8;
+  font-size: 13px;
+  text-decoration: none;
+  transition: color .15s ease;
+}
+
+.onramp-tx-link:hover {
+  color: #b6ff6e;
+}
+
+.onramp-check {
+  margin-bottom: 4px;
+}
+
+.onramp-card .alert {
+  margin-top: 24px;
+}
+
+.onramp-card .text-button {
+  margin-top: 6px;
+  font-size: 14px;
+}
