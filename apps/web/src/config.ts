@@ -46,6 +46,10 @@ export const config = Object.freeze({
   // check that the proof's certificate root is still valid on-chain.
   zkPassportRootRegistry: '0x1D0000020038d6E40E1d98e09fA1bb3A7DAA8B70' as const,
   zkPassportCertificateRegistry: '0x5135c41430e263Fbf734Be9F1fE9F5833B81393F' as const,
+  // Kernel factory salt. Bump to force every wallet to a fresh address: stored
+  // sessions stop deriving (KERNEL_ADDRESS_DERIVATION_MISMATCH → reset), so all
+  // users get a clean wallet with no legacy-state handling.
+  walletSalt: 1n,
   redirectOrigin: (redirectUrl && redirectUrl !== 'window.location.origin')
     ? redirectUrl
     : window.location.origin,

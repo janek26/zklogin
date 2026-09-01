@@ -20,7 +20,7 @@ export interface WalletClients {
 }
 
 export async function createWalletClients(validator: KernelValidator<'ZkLoginKernelValidator' | 'RecoveryValidator'>): Promise<WalletClients> {
-  const account = await createKernelAccount(publicClient, { entryPoint, kernelVersion, index: 0n, plugins: { sudo: validator } })
+  const account = await createKernelAccount(publicClient, { entryPoint, kernelVersion, index: config.walletSalt, plugins: { sudo: validator } })
   const paymasterClient = createZeroDevPaymasterClient({ chain: config.chain, transport: http(config.zeroDevRpcUrl) })
   const sponsor = async (userOperation: Parameters<typeof paymasterClient.sponsorUserOperation>[0]['userOperation']) => paymasterClient.sponsorUserOperation({ userOperation })
   const kernelClient = createKernelAccountClient({
