@@ -313,7 +313,7 @@ export function App() {
 
         {wallet && !recovered && (
           <>
-            {guardianReady && (
+            {!guardianReady && !pending && (
               <RecoveryBanner
                 kind="absent"
                 onSetup={() => setShowSetup(true)}
