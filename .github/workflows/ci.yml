@@ -22,6 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { submodules: true }
+      - uses: foundry-rs/foundry-toolchain@v1
       - run: cd contracts && FILES=$(find src test script -name '*.sol' | grep -v UltraVerifier.sol) && forge fmt --check $FILES
       - run: cd contracts && forge build
       - run: cd contracts && forge test
@@ -43,6 +44,8 @@ jobs:
           fail() { echo "MISSING: $1"; exit 1; }
           [ -n "$VITE_GOOGLE_CLIENT_ID" ] || fail VITE_GOOGLE_CLIENT_ID
           echo "$VITE_GOOGLE_CLIENT_ID" | grep -qF '.apps.googleusercontent.com' || fail 'VITE_GOOGLE_CLIENT_ID (not a Google client ID)'
+          [ -n "$VITE_ZERODEV_PROJECT_ID" ] || fail VITE_ZERODEV_PROJECT_ID
+          echo "$VITE_ZERODEV_PROJECT_ID" | grep -qE '^[0-9a-f-]{36}$' || fail 'VITE_ZERODEV_PROJECT_ID (not a UUID)'
           [ -n "$VITE_SEPOLIA_RPC_URL" ] || fail VITE_SEPOLIA_RPC_URL
           [ -n "$CLOUDFLARE_API_TOKEN" ] || fail CLOUDFLARE_API_TOKEN
           [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || fail CLOUDFLARE_ACCOUNT_ID
