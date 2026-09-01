@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { createPublicClient, getAddress, http, keccak256 } from 'viem'
 import { sepolia } from 'viem/chains'
 
-const rpcUrl = process.env.SEPOLIA_RPC_URL ?? 'https://ethereum-sepolia-rpc.publicnode.com'
+const rpcUrl = process.env.SEPOLIA_RPC_URL ?? 'https://eth-sepolia.g.alchemy.com/v2/alch_5OJye4DK3Nyur-3ivzvOC'
 const deployment = JSON.parse(await readFile(new URL('../apps/web/src/generated/deployment-sepolia.json', import.meta.url)))
 if (deployment.generation < 1) throw new Error('deployment-sepolia.json is a template')
 const client = createPublicClient({ chain: sepolia, transport: http(rpcUrl) })
