@@ -1,9 +1,12 @@
-import type { Address, Hex } from 'viem'
-import { publicClient } from '../aa/client'
-import { config } from '../config'
+import type { Address, Hex, PublicClient } from 'viem'
 import type { PassportProofParams } from './recovery'
 
-type RegistryReader = Pick<typeof publicClient, 'readContract'>
+/**
+ * Structural subset of a viem public client — only `readContract` is used.
+ * Declared locally so this module never imports `aa/client` → `config`, which
+ * throws at module-evaluation time when CI runs tests without env vars.
+ */
+export type RegistryReader = Pick<PublicClient, 'readContract'>
 
 // RegistryID.CERTIFICATE — see zkpassport-registry-contracts lib/Constants.sol
 const CERTIFICATE_REGISTRY_ID: Hex = '0x0000000000000000000000000000000000000000000000000000000000000001'
@@ -43,7 +46,7 @@ const rootRegistryAbi = [
  */
 export async function checkCertificateRoot(
   params: PassportProofParams,
-  reader: RegistryReader = publicClient,
+  deps: { reader: RegistryReader; registryAddress: Address },
 ): Promise<string | null> {
   const publicInputs = params.proofVerificationData.publicInputs
   const certificateRoot = publicInputs[0]
@@ -51,25 +54,24 @@ export async function checkCertificateRoot(
   const proofTimestamp = publicInputs[2]
 
   try {
-    const registry = config.zkPassportRootRegistry as Address
     const [valid, latest] = await Promise.all([
-      reader.readContract({
-        address: registry,
+      deps.reader.readContract({
+        address: deps.registryAddress,
         abi: rootRegistryAbi,
         functionName: 'isRootValid',
         args: [CERTIFICATE_REGISTRY_ID, certificateRoot as Hex, BigInt(proofTimestamp)],
       }),
-      reader.readContract({
-        address: registry,
+      deps.reader.readContract({
+        address: deps.registryAddress,
         abi: rootRegistryAbi,
         functionName: 'latestRoot',
         args: [CERTIFICATE_REGISTRY_ID],
       }),
     ])
 
-    if (valid) return null
+    if (valid === true) return null
 
-    const latestShort = latest ? `${latest.slice(0, 10)}…${latest.slice(-8)}` : 'unknown'
+    const latestShort = latest ? `${String(latest).slice(0, 10)}…${String(latest).slice(-8)}` : 'unknown'
     const proofShort = certificateRoot ? `${certificateRoot.slice(0, 10)}…${certificateRoot.slice(-8)}` : 'unknown'
     return [
       'The passport app generated this proof against a stale certificate registry.',

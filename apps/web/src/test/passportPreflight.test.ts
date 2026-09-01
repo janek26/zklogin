@@ -1,10 +1,11 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi, type Mock } from 'vitest'
 import type { Hex } from 'viem'
-import { checkCertificateRoot } from '../lib/passportPreflight'
+import { checkCertificateRoot, type RegistryReader } from '../lib/passportPreflight'
 import type { PassportProofParams } from '../lib/recoveryCore'
 
 const LATEST_ROOT: Hex = '0x0230cf7904896615a2fab194d5d0e7115bce9749aaaf61805fea7aaf1c8200c0'
 const STALE_ROOT: Hex = '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+const REGISTRY = '0x1D0000020038d6E40E1d98e09fA1bb3A7DAA8B70'
 
 function proofParams(certRoot: Hex): PassportProofParams {
   return {
@@ -19,44 +20,48 @@ function proofParams(certRoot: Hex): PassportProofParams {
   }
 }
 
-function reader(valid: boolean, latest: Hex, fail = false) {
-  const fn = vi.fn()
+function makeReader(valid: boolean, latest: Hex, fail = false) {
+  const readContract = vi.fn()
   if (fail) {
-    fn.mockRejectedValue(new Error('RPC unreachable'))
+    readContract.mockRejectedValue(new Error('RPC unreachable'))
   } else {
-    fn.mockResolvedValueOnce(valid).mockResolvedValueOnce(latest)
+    readContract.mockResolvedValueOnce(valid).mockResolvedValueOnce(latest)
   }
-  return { readContract: fn }
+  return { readContract, reader: { readContract } as unknown as RegistryReader }
 }
 
 describe('checkCertificateRoot', () => {
   it('returns null when the proof root is valid on-chain', async () => {
-    const result = await checkCertificateRoot(proofParams(LATEST_ROOT), reader(true, LATEST_ROOT))
+    const { reader } = makeReader(true, LATEST_ROOT)
+    const result = await checkCertificateRoot(proofParams(LATEST_ROOT), { reader, registryAddress: REGISTRY })
     expect(result).toBeNull()
   })
 
   it('describes the mismatch when the proof root is stale', async () => {
-    const message = await checkCertificateRoot(proofParams(STALE_ROOT), reader(false, LATEST_ROOT))
+    const { reader } = makeReader(false, LATEST_ROOT)
+    const message = await checkCertificateRoot(proofParams(STALE_ROOT), { reader, registryAddress: REGISTRY })
     expect(message).toContain('stale certificate registry')
     expect(message).toContain('aaaaaaaa')
     expect(message).toContain('0230cf')
   })
 
   it('returns null when the registry is unreachable (let simulation judge)', async () => {
-    const result = await checkCertificateRoot(proofParams(LATEST_ROOT), reader(true, LATEST_ROOT, true))
+    const { reader } = makeReader(true, LATEST_ROOT, true)
+    const result = await checkCertificateRoot(proofParams(LATEST_ROOT), { reader, registryAddress: REGISTRY })
     expect(result).toBeNull()
   })
 
   it('passes the certificate registry id and proof timestamp to the registry', async () => {
-    const r = reader(true, LATEST_ROOT)
-    await checkCertificateRoot(proofParams(STALE_ROOT), r)
-    const isRootValidCall = r.readContract.mock.calls[0][0]
+    const { readContract, reader } = makeReader(true, LATEST_ROOT)
+    await checkCertificateRoot(proofParams(STALE_ROOT), { reader, registryAddress: REGISTRY })
+    const mock = readContract as Mock
+    const isRootValidCall = mock.mock.calls[0][0] as { functionName: string; args: unknown[] }
     expect(isRootValidCall.functionName).toBe('isRootValid')
     expect(isRootValidCall.args[0]).toBe('0x0000000000000000000000000000000000000000000000000000000000000001')
     expect(isRootValidCall.args[1]).toBe(STALE_ROOT)
     expect(isRootValidCall.args[2]).toBe(1n)
-    const latestCall = r.readContract.mock.calls[1][0]
+    const latestCall = mock.mock.calls[1][0] as { functionName: string; address: string }
     expect(latestCall.functionName).toBe('latestRoot')
-    expect(latestCall.address).toBe('0x1D0000020038d6E40E1d98e09fA1bb3A7DAA8B70')
+    expect(latestCall.address).toBe(REGISTRY)
   })
 })

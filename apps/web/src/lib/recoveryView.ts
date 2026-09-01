@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Address } from 'viem'
 import { zeroAddress } from 'viem'
 import type { Wallet } from './types'
-import { waitForSuccess } from '../aa/client'
+import { publicClient, waitForSuccess } from '../aa/client'
 import { config } from '../config'
 import type { PassportProofResult } from '../components/PassportProofRequest'
 import { checkCertificateRoot } from './passportPreflight'
@@ -125,7 +125,10 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
     try {
       // Catch the common stale-certificate-root failure before the paymaster
       // simulation buries it in a nested RPC error.
-      const staleRoot = await checkCertificateRoot(result.params)
+      const staleRoot = await checkCertificateRoot(result.params, {
+        reader: publicClient,
+        registryAddress: config.zkPassportRootRegistry as Address,
+      })
       if (staleRoot) {
         setError(staleRoot)
         throw new Error(staleRoot)
