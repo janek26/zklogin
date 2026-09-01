@@ -5,6 +5,8 @@ import type { Wallet } from './types'
 import { waitForSuccess } from '../aa/client'
 import { config } from '../config'
 import type { PassportProofResult } from '../components/PassportProofRequest'
+import { checkCertificateRoot } from './passportPreflight'
+import { extractRevertReason } from './utils'
 import {
   ACTION_SET_GUARDIAN,
   bindingAsciiHex,
@@ -121,6 +123,13 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
   const submitSetGuardian = useCallback(async (result: PassportProofResult) => {
     if (!args.kernelAddress || !state) return
     try {
+      // Catch the common stale-certificate-root failure before the paymaster
+      // simulation buries it in a nested RPC error.
+      const staleRoot = await checkCertificateRoot(result.params)
+      if (staleRoot) {
+        setError(staleRoot)
+        throw new Error(staleRoot)
+      }
       await runOp(() => args.wallet!.kernelClient.sendUserOperation({
         calls: [{
           to: config.validatorAddress,
@@ -129,7 +138,7 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
         }],
       }))
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'SET_GUARDIAN_FAILED')
+      setError(extractRevertReason(cause) ?? (cause instanceof Error ? cause.message : 'SET_GUARDIAN_FAILED'))
       throw cause
     }
   }, [args.kernelAddress, state, args.wallet, runOp])

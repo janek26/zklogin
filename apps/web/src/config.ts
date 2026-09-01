@@ -41,6 +41,11 @@ export const config = Object.freeze({
   ultraVerifierAddress: deployedAddress('ultraVerifier', deployment.ultraVerifier),
   jwkRoot: bytes32('googleJwkRoot', deployment.googleJwkRoot),
   appId: bytes32('appId', deployment.appId),
+  // ZKPassport-operated Sepolia infrastructure (deterministic across chains,
+  // per docs.zkpassport.id/getting-started/onchain). Used for a pre-submit
+  // check that the proof's certificate root is still valid on-chain.
+  zkPassportRootRegistry: '0x1D0000020038d6E40E1d98e09fA1bb3A7DAA8B70' as const,
+  zkPassportCertificateRegistry: '0x5135c41430e263Fbf734Be9F1fE9F5833B81393F' as const,
   redirectOrigin: (redirectUrl && redirectUrl !== 'window.location.origin')
     ? redirectUrl
     : window.location.origin,

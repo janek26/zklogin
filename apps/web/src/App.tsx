@@ -400,6 +400,7 @@ export function App() {
             rotating={guardianReady}
             submitting={recovery.submitting}
             customData={setupCustomData}
+            error={recovery.error}
             onProofResult={(result) => { void handleSetupProof(result) }}
             onProofError={(err) => setError(err)}
             onCancelSetup={() => setShowSetup(false)}

@@ -19,6 +19,66 @@ export function decodeRevertReason(data: Hex | string): string | null {
   }
 }
 
+/**
+ * Digs a readable revert reason out of any thrown value — including nested
+ * viem/ZeroDev error chains where the simulation revert from
+ * `zd_sponsorUserOperation` is buried several `cause` levels deep. Checks, in
+ * order: a direct `data` field, the raw `0x08c379a0…` hex embedded in any
+ * string field, then already-decoded reason text in `message`/`details`.
+ */
+export function extractRevertReason(err: unknown): string | null {
+  if (!err) return null
+
+  const seen = new Set<unknown>()
+  let current: unknown = err
+  while (current && !seen.has(current)) {
+    seen.add(current)
+    const record = current as Record<string, unknown>
+
+    // Direct revert-data field (JsonRpcError / ContractFunctionRevertedError).
+    if (typeof record.data === 'string' && record.data.startsWith('0x08c379a0')) {
+      const decoded = decodeRevertReason(record.data)
+      if (decoded) return decoded
+    }
+
+    // Hex embedded in any message-ish string.
+    for (const key of ['message', 'shortMessage', 'details', 'data', 'metaMessages']) {
+      const value = record[key]
+      const strings = Array.isArray(value)
+        ? value.filter((v): v is string => typeof v === 'string')
+        : typeof value === 'string'
+          ? [value]
+          : []
+      for (const text of strings) {
+        const match = text.match(/0x08c379a0[0-9a-fA-F]{64,}/)
+        if (match) {
+          const decoded = decodeRevertReason(match[0])
+          if (decoded) return decoded
+        }
+      }
+    }
+
+    // Already-decoded reason. viem: "…reverted with the following reason:\n
+    // Invalid certificate registry root" (reason on its own line). ZeroDev:
+    // 'Error: "Invalid certificate registry root"' (quoted inline).
+    for (const key of ['message', 'shortMessage', 'details']) {
+      const text = record[key]
+      if (typeof text !== 'string') continue
+
+      // Quoted inline reason: Error: "…" or 'reverted with reason: "…"'
+      const quoted = text.match(/reason[:\s]*["']([^"']{2,})["']/i)
+      if (quoted) return quoted[1].trim()
+
+      // Reason on its own line after the label (viem multi-line format).
+      const ownLine = text.match(/reason[:\s]*\n\s*([A-Za-z][A-Za-z0-9_ ]{2,})/i)
+      if (ownLine) return ownLine[1].trim()
+    }
+
+    current = record.cause
+  }
+  return null
+}
+
 export function shortAddress(address: string) { return `${address.slice(0, 6)}…${address.slice(-4)}` }
 export function formatExpiry(ts: number) { return new Date(ts * 1000).toLocaleString() }
 

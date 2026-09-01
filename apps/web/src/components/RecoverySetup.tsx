@@ -30,6 +30,8 @@ export function RecoverySetup(props: {
   rotating: boolean
   submitting: boolean
   customData: string
+  /** Submission/scan failure message from the parent, shown in step 3. */
+  error?: string | null
   onProofResult: (result: PassportProofResult) => void
   onProofError: (error: string) => void
   onCancelSetup: () => void
@@ -183,6 +185,11 @@ export function RecoverySetup(props: {
             />
             {props.submitting && (
               <p className="recovery-details">Submitting guardian update…</p>
+            )}
+            {props.error && (
+              <p className="recovery-error" role="alert">
+                {props.error}
+              </p>
             )}
           </div>
         </div>

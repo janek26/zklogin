@@ -723,6 +723,7 @@ input:focus {
 .recovery-unsafe { border-color: #ff5c5c66; background: #1c1015; }
 .recovery-details { margin-top: 6px !important; font-size: 11.5px !important; color: #777482 !important; }
 .recovery-details code { font-family: 'DM Mono', monospace; font-size: 11px; }
+.recovery-error { margin-top: 10px !important; padding: 10px 12px; border: 1px solid #ff5c5c66; border-radius: 10px; background: #1c1015; color: #ff9d9d !important; font-size: 12.5px !important; line-height: 1.55; }
 
 .compact-button {
   display: inline-flex;
