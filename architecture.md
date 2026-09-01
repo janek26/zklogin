@@ -1,6 +1,6 @@
 # zkLogin Native Wallet — Architecture
 
-A browser-based zero-knowledge proof wallet POC. Google identity → local ZK proof → on-chain smart account activation on Megaeth testnet (chain 6343). No custody, no hosted prover.
+A browser-based zero-knowledge proof wallet POC. Google identity → local ZK proof → on-chain smart account activation on Ethereum Sepolia (chain 11155111), with self-passport guardian recovery. No custody, no hosted prover.
 
 ## System overview
 
@@ -56,7 +56,7 @@ sequenceDiagram
 │   │   │   └── Icons.tsx          # SVG icons (Copy, Arrow, Refresh)
 │   │   ├── benchmark/             # Benchmark worker + fixture
 │   │   ├── generated/             # Build artifacts
-│   │   │   ├── deployment-megaeth.json  # Contract addresses, JWK root, app ID
+│   │   │   ├── deployment-sepolia.json  # Contract addresses, JWK root, app ID
 │   │   │   ├── jwk-snapshot.json        # Frozen Google JWKS snapshot with Merkle proofs
 │   │   │   └── benchmark-fixture.json   # Test JWT + JWK data
 │   │   └── test/
@@ -301,10 +301,10 @@ Auto-generated Noir Groth16 verifier from `@shield-labs/zklogin-contracts@0.5.0`
 
 `apps/web/src/config.ts` freezes a `config` object from:
 - `import.meta.env.VITE_*` (Vite 8 requires dot notation — `VITE_FOO`, not `import.meta.env[name]`)
-- `./generated/deployment-megaeth.json` (contract addresses, JWK root, app ID)
+- `./generated/deployment-sepolia.json` (contract addresses, JWK root, app ID)
 
 Validates at import time:
-- `deployment.generation >= 1 && deployment.chainId === 6343`
+- `deployment.generation >= 1 && deployment.chainId === 11155111`
 - `validatorAddress`, `ultraVerifierAddress` are non-zero
 - `googleJwkRoot`, `appId` are non-zero bytes32
 - All `VITE_*` vars are non-empty

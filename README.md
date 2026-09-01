@@ -1,7 +1,7 @@
 # zkLogin native wallet
 
 Browser-only Google zkLogin proof, ZeroDev Kernel 0.3.3 / EntryPoint 0.7, and
-MegaETH testnet native transfers.
+Ethereum Sepolia native transfers with self-passport guardian recovery.
 
 **Unaudited research POC — testnet only.**
 
@@ -21,7 +21,7 @@ window. "Native only" is a UI constraint, not an on-chain policy.
 - Node 22.23.1 and pnpm 11.12.0
 - Foundry for Solidity build, test, and deploy
 - A Google Web OAuth client and a ZeroDev project with sponsorship for
-  MegaETH testnet (chain 6343)
+  Ethereum Sepolia (chain 11155111)
 - A deployer key held outside the repository
 
 ```sh
@@ -41,19 +41,40 @@ apps/web/src/
   config.ts                   chain + deployment config
   aa/                         account abstraction (Kernel client, validator)
   auth/                       prove, nonce, JWT validation, Web Worker
-  components/                 onboarding, wallet view, icons
-  lib/                        types, reducer, utils, session
+  components/                 onboarding, wallet view, recovery UI, icons
+  lib/                        types, reducer, utils, session, recovery, recoveryView
   generated/                  deployment JSON, JWK snapshot
+  recovery.html               standalone passport-recovery entrypoint
 contracts/
-  src/                        ZkLoginKernelValidator, UltraVerifier
-  script/                     Foundry deploy script
+  src/                        ZkLoginKernelValidator, ZkLoginKernelValidatorV2, UltraVerifier
+  script/                     Foundry deploy scripts
   test/                       Foundry test suite
 ```
+
+## Passport recovery
+
+The wallet can be made recoverable with the user's own ZKPassport identity
+(guardian). A passport proof proposes a browser-local replacement owner; after
+a user-selected delay (Immediate, 1, 3, 7, or 30 days) the local owner
+finalizes recovery. All recovery UserOperations are sponsored through ZeroDev;
+users never need Sepolia ETH.
+
+- Guardian setup/rotation/removal lives on the dashboard ("Add passport recovery").
+- A pending proposal shows a persistent banner with cancellation.
+- The finalized local owner is deliberately unsafe: keep the existing Send UI
+  to move funds, then use "Forget recovery key" only from an empty wallet.
+- `recovery.html` is a standalone static recovery entrypoint that needs no
+  Google sign-in. It can only complete proposals whose local key exists in
+  that browser's storage; another browser starting recovery replaces the
+  proposal and restarts the delay.
+
+See [RECOVERY_PLAN.md](RECOVERY_PLAN.md) for the full design and
+[SETUP.md](SETUP.md) for the Sepolia deployment.
 
 ## Verify
 
 ```sh
-pnpm verify          # typecheck, vitest, build, contract integration (16 assertions)
+pnpm verify          # typecheck, vitest, build, contract integration
 pnpm verify:deployment  # on-chain contract audit
 ```
 

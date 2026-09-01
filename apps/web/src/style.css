@@ -701,11 +701,115 @@ svg {
   justify-content: center;
 }
 
-/* Keyframes */
 
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes enter { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes toast { from { opacity: 0; transform: translateY(8px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+/* Passport recovery */
+
+.recovery-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 18px;
+  border: 1px solid #2c2b35;
+  border-radius: 14px;
+  background: #12121a;
+  margin-bottom: 14px;
+}
+.recovery-banner h3 { margin: 0 0 4px; font-size: 14px; color: #e9e8f3; letter-spacing: -.01em; }
+.recovery-banner p { margin: 0; font-size: 12.5px; line-height: 1.5; color: #a5a2b4; }
+.recovery-banner .recovery-banner-action { flex-shrink: 0; }
+.recovery-absent { border-color: #b6ff6e55; }
+.recovery-pending { border-color: #f5c96b66; }
+.recovery-unsafe { border-color: #ff5c5c66; background: #1c1015; }
+.recovery-details { margin-top: 6px !important; font-size: 11.5px !important; color: #777482 !important; }
+.recovery-details code { font-family: 'DM Mono', monospace; font-size: 11px; }
+
+.compact-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: transform .15s ease, filter .15s ease;
+}
+.compact-button:hover:not(:disabled) { filter: brightness(1.07); }
+.compact-button:disabled { cursor: not-allowed; opacity: .5; }
+
+.compact-button.primary {
+  color: #11150d;
+  background: #b6ff6e;
+}
+.compact-button.danger {
+  color: #ffb1b1;
+  background: #3a1616;
+  border: 1px solid #5a2222;
+}
+
+.recovery-setup .setup-disclosure {
+  margin: 14px 0;
+  padding: 12px 14px;
+  border: 1px solid #2c2b35;
+  border-radius: 10px;
+  background: #101018;
+  color: #a5a2b4;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.delay-chooser {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 14px 0;
+}
+.delay-card {
+  padding: 12px 8px;
+  border: 1px solid #2c2b35;
+  border-radius: 10px;
+  background: #111117;
+  color: #c3c1d0;
+  text-align: center;
+}
+.delay-card strong { font: 600 12px/1.3 'DM Mono', monospace; }
+.delay-card.selected { border-color: #b6ff6e; color: #e9e8f3; }
+.delay-card:disabled { opacity: .5; cursor: not-allowed; }
+
+.confirm-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: #c3c1d0;
+}
+
+.qr-card { margin: 14px 0; }
+.qr-card p { color: #a5a2b4; font-size: 13px; line-height: 1.55; margin-bottom: 12px; }
+
+.recover-action {
+  margin-top: 14px;
+  color: #777482;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #3a3945;
+}
+.recover-action:hover { color: #b6ff6e; text-decoration-color: currentColor; }
+
+.recovery-login h1 { font-size: 24px; letter-spacing: -.03em; margin: 18px 0 10px; }
+.recovery-login .field { margin: 14px 0; }
+.recovery-countdown {
+  font: 600 22px/1 'DM Mono', monospace;
+  color: #b6ff6e;
+  margin: 18px 0;
+}
+.recovery-done { text-align: center; padding: 32px 0; }
 
 /* Responsive */
 

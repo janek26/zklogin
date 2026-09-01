@@ -4,14 +4,14 @@ Quick reference for AI agents working on this repo. Full architecture: [`archite
 
 ## One-liner
 
-Browser-based ZK proof wallet. Google Sign-In (pure OAuth redirect) → local WASM proof generation (UltraPlonk) → ZeroDev Kernel v3.3 smart account on Megaeth testnet (chain 6343).
+Browser-based ZK proof wallet. Google Sign-In (pure OAuth redirect) → local WASM proof generation (UltraPlonk) → ZeroDev Kernel v3.3 smart account on Ethereum Sepolia (chain 11155111), with self-passport guardian recovery.
 
 ## Quick facts
 
 | Thing | Value | Source |
 |---|---|---|
-| Chain | Megaeth testnet, chain ID 6343 | `apps/web/src/config.ts:35` |
-| RPC | See `.env.local` / CI env | `VITE_MEGAETH_TESTNET_RPC_URL` |
+| Chain | Ethereum Sepolia, chain ID 11155111 | `apps/web/src/config.ts:35` |
+| RPC | See `.env.local` / CI env | `VITE_SEPOLIA_RPC_URL` |
 | ZeroDev Project ID | See `.env.local` | `VITE_ZERODEV_PROJECT_ID` |
 | Google Client ID | See `.env.local` | `VITE_GOOGLE_CLIENT_ID` |
 | Production URL | See CI env | `VITE_REDIRECT_URL` |
@@ -44,7 +44,7 @@ See [`architecture.md` §Repository layout](architecture.md#repository-layout) f
 | All styles | `apps/web/src/style.css` |
 | Validator contract | `contracts/src/ZkLoginKernelValidator.sol` |
 | UltraPlonk verifier | `contracts/src/UltraVerifier.sol` |
-| Deployment JSON | `apps/web/src/generated/deployment-megaeth.json` |
+| Deployment JSON | `apps/web/src/generated/deployment-sepolia.json` |
 | JWK snapshot | `apps/web/src/generated/jwk-snapshot.json` |
 | HTTP headers (COOP/COEP) | `apps/web/public/_headers` |
 | CI/CD | `.github/workflows/ci.yml` |

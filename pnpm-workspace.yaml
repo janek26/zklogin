@@ -2,5 +2,6 @@ packages:
   - apps/*
 allowBuilds:
   bufferutil: true
+  msgpackr-extract: set this to true or false
   utf-8-validate: true
 verifyDepsBeforeRun: false

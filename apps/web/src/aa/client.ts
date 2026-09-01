@@ -1,4 +1,4 @@
-import type { Hex } from 'viem'
+import type { Address, Hex } from 'viem'
 import { createPublicClient, http } from 'viem'
 import { createKernelAccount, createKernelAccountClient, createZeroDevPaymasterClient } from '@zerodev/sdk'
 import { KERNEL_V3_3, getEntryPoint } from '@zerodev/sdk/constants'
@@ -9,7 +9,7 @@ export const entryPoint = getEntryPoint('0.7')
 export const kernelVersion = KERNEL_V3_3
 export const publicClient = createPublicClient({ chain: config.chain, transport: http(config.publicRpcUrl), pollingInterval: 200 })
 
-export async function createWalletClients(validator: KernelValidator<'ZkLoginKernelValidator'>) {
+export async function createWalletClients(validator: KernelValidator<'ZkLoginKernelValidator' | 'RecoveryValidator'>) {
   const account = await createKernelAccount(publicClient, { entryPoint, kernelVersion, index: 0n, plugins: { sudo: validator } })
   const paymasterClient = createZeroDevPaymasterClient({ chain: config.chain, transport: http(config.zeroDevRpcUrl) })
   const sponsor = async (userOperation: Parameters<typeof paymasterClient.sponsorUserOperation>[0]['userOperation']) => paymasterClient.sponsorUserOperation({ userOperation })
@@ -19,6 +19,16 @@ export async function createWalletClients(validator: KernelValidator<'ZkLoginKer
     pollingInterval: 200,
   })
   return { account, kernelClient }
+}
+
+/** Address-based account construction for recovery: derive the same Kernel the
+ * wallet already uses, then verify the derivation matches. */
+export async function createRecoveryWalletClients(validator: KernelValidator<'RecoveryValidator'>, expectedKernelAddress: Address) {
+  const clients = await createWalletClients(validator as KernelValidator<'ZkLoginKernelValidator' | 'RecoveryValidator'>)
+  if (clients.account.address.toLowerCase() !== expectedKernelAddress.toLowerCase()) {
+    throw new Error('KERNEL_ADDRESS_DERIVATION_MISMATCH')
+  }
+  return clients
 }
 
 export async function waitForSuccess(kernelClient: Awaited<ReturnType<typeof createWalletClients>>['kernelClient'], hash: Hex) {

@@ -1,6 +1,6 @@
 {
-  "generation": 1,
-  "chainId": 6343,
+  "generation": 2,
+  "chainId": 11155111,
   "entryPointVersion": "0.7",
   "kernelVersion": "0.3.3",
   "kernelIndex": "0",
@@ -9,12 +9,14 @@
   "kernelFactory": "0x2577507b78c2008Ff367261CB6285d44ba5eF2E9",
   "kernelMetaFactory": "0xd703aaE79538628d27099B8c4f621bE4CCd142d5",
   "ultraVerifier": "0xc278E3887c2AF9271C0dd6D422Dd4090Baba5AB1",
-  "validator": "0x8A5CBcaC847B0ed5eb3ef49bdC58565880746ae7",
+  "validator": "0x8a5cbcac847b0ed5eb3ef49bdc58565880746ae7",
+  "zkPassportVerifier": "0x1D000001000EFD9a6371f4d90bB8920D5431c0D8",
   "googleJwkRoot": "0x32a0b760094a508cd1b3480d9edbc709c05a8317b679764bdaec0494225067cb",
   "appId": "0xf05440c0d518217b9c71b1f6cf825cc2286d1dfc8ffa8f4c91650d18613c9364",
   "shieldCommit": "31d7030708f7074ec2cf57fe9bb7a024283d50e0",
+  "zkPassportCommit": "1a1836eb958b7d7bbb47fab060128757748dba6a",
   "runtimeCodeHashes": {
-    "ultraVerifier": "0xc32846771de303e6141c16792055139d1fc4e7cfdf0a9f312af7bfd1f178de7f",
-    "validator": "0x0ddfec07c5983a7d7d523bc5490539090c2c07064757a8df849488f13dbc872a"
+    "ultraVerifier": "0x4c5dee56cc845340d1bc54a9c0975381cdc722f8c34af701a94ec5e4eebbb227",
+    "validator": "0x01b6e69fc4db81511902305878897a45a84f41ca38bef9c9c35fc1a5ddd6e820"
   }
 }

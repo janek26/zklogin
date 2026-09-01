@@ -4,7 +4,11 @@ import { defineConfig } from 'vite'
 export default defineConfig(({ mode }) => ({
   base: '/',
   plugins: [react()],
-  build: { target: 'esnext', sourcemap: false },
+  build: {
+    target: 'esnext',
+    sourcemap: false,
+    rollupOptions: { input: { main: 'index.html', recovery: 'recovery.html' } },
+  },
   optimizeDeps: {
     exclude: ['@noir-lang/noirc_abi', '@noir-lang/acvm_js'],
     esbuildOptions: { target: 'esnext' },

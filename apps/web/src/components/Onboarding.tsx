@@ -23,12 +23,14 @@ export function Onboarding({
   error,
   proofProgress,
   onReset,
+  onRecover,
 }: {
   stage: Stage
   preLogin: PreLoginSession
   error: string | null
   proofProgress: number
   onReset: () => void
+  onRecover?: () => void
 }) {
   const showProgress = stage === 'PROVING' || stage === 'ACTIVATING' || stage === 'PREPARING'
   const isIosSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS|mercury/.test(navigator.userAgent)
@@ -96,6 +98,11 @@ export function Onboarding({
             Continue with Google
           </button>
           <p>A single sign-in activates a 24-hour session.</p>
+          {onRecover && (
+            <button type="button" className="text-button recover-action" onClick={onRecover}>
+              Recover with passport
+            </button>
+          )}
         </div>
       )}
 
