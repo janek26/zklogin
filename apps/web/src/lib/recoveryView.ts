@@ -111,9 +111,15 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
     submittingRef.current = true
     setSubmitting(true)
     try {
+      console.log('[recovery] sending sponsored UserOperation…')
       const hash = await send()
+      console.log('[recovery] UserOperation sent', hash)
       await waitForSuccess(args.wallet.kernelClient, hash)
+      console.log('[recovery] UserOperation confirmed', hash)
       await refresh()
+    } catch (cause) {
+      console.error('[recovery] UserOperation failed', cause)
+      throw cause
     } finally {
       submittingRef.current = false
       setSubmitting(false)
@@ -130,9 +136,14 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
         registryAddress: config.zkPassportRootRegistry as Address,
       })
       if (staleRoot) {
+        console.warn('[recovery] certificate registry preflight failed', staleRoot)
         setError(staleRoot)
         throw new Error(staleRoot)
       }
+      console.log('[recovery] submitting setGuardian', {
+        kernel: args.kernelAddress,
+        delaySeconds: state.recoveryDelay,
+      })
       await runOp(() => args.wallet!.kernelClient.sendUserOperation({
         calls: [{
           to: config.validatorAddress,
@@ -141,7 +152,9 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
         }],
       }))
     } catch (cause) {
-      setError(extractRevertReason(cause) ?? (cause instanceof Error ? cause.message : 'SET_GUARDIAN_FAILED'))
+      const reason = extractRevertReason(cause)
+      console.error('[recovery] setGuardian failed', { reason, error: cause })
+      setError(reason ?? (cause instanceof Error ? cause.message : 'SET_GUARDIAN_FAILED'))
       throw cause
     }
   }, [args.kernelAddress, state, args.wallet, runOp])

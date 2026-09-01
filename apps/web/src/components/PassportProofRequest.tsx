@@ -37,15 +37,36 @@ export function PassportProofRequest(props: {
   onError: (error: string) => void
 }) {
   const handleResult = ({ uniqueIdentifier, verified, proofs, sdkInstance }: OnResultResponse) => {
-    if (!verified) return
+    if (!verified) {
+      console.warn('[passport] proof reported not verified', { uniqueIdentifier, verified })
+      return
+    }
     // compressed-evm mode returns a single outer proof — per ZKPassport docs,
     // take proofs[0] directly rather than filtering by name.
     const outer = proofs[0]
     if (!outer) {
+      console.warn('[passport] no outer EVM proof in result', { proofCount: proofs.length })
       props.onError('NO_OUTER_EVM_PROOF')
       return
     }
     const verifierParams = sdkInstance.getSolidityVerifierParameters({ proof: outer, scope: 'policy-1:1' })
+    // Console visibility: the embedded certificate/circuit registry roots and
+    // proof date are what the on-chain verifier checks first.
+    console.log('[passport] proof result', {
+      uniqueIdentifier,
+      verified,
+      proofCount: proofs.length,
+      version: verifierParams.version,
+      vkeyHash: verifierParams.proofVerificationData.vkeyHash,
+      certificateRegistryRoot: verifierParams.proofVerificationData.publicInputs[0],
+      circuitRegistryRoot: verifierParams.proofVerificationData.publicInputs[1],
+      currentDate: verifierParams.proofVerificationData.publicInputs[2],
+      scope: verifierParams.serviceConfig.scope,
+      domain: verifierParams.serviceConfig.domain,
+      validityPeriodInSeconds: verifierParams.serviceConfig.validityPeriodInSeconds,
+      devMode: verifierParams.serviceConfig.devMode,
+      proofBytes: verifierParams.proofVerificationData.proof.length,
+    })
     props.onResult({
       params: {
         version: verifierParams.version as `0x${string}`,

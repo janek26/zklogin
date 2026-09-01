@@ -205,8 +205,9 @@ export function App() {
     try {
       await recovery.submitSetGuardian(result)
       setShowSetup(false)
-    } catch {
-      // error surfaced via recovery.error
+    } catch (cause) {
+      // Error surfaced via recovery.error — log the raw chain for DevTools.
+      console.error('[recovery] setup proof submission failed', cause)
     }
   }, [recovery])
 
