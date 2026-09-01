@@ -101,15 +101,23 @@ describe('exact call-data builders', () => {
 })
 
 describe('recovery view-model transitions', () => {
+  it('absent when no guardian is installed (zero bytes32 nullifier) and no proposal', () => {
+    // Regression: guardianNullifier is bytes32 — the zero bytes32
+    // (0x0000…0000, 64 chars) must be treated as "no guardian", never
+    // compared against the 20-byte zeroAddress, and never truthy.
+    const state = baseState({
+      guardianNullifier: `0x${'00'.repeat(32)}`,
+      recovery: { proposedOwner: zeroAddress, executableAt: 0, nonce: 0n },
+    })
+    expect(recoverySurfaceKind(state)).toBe('absent')
+  })
 
-  it('absent when recovery.proposedOwner is the zero address (not a real proposal)', () => {
-    // Regression: 0x0000…0000 is a truthy string, so truthiness checks must
-    // not classify an empty proposal slot as pending.
+  it('none once a guardian is installed', () => {
     const state = baseState({
       guardianNullifier: `0x${'aa'.repeat(32)}`,
       recovery: { proposedOwner: zeroAddress, executableAt: 0, nonce: 0n },
     })
-    expect(recoverySurfaceKind(state)).toBe('absent')
+    expect(recoverySurfaceKind(state)).toBe('none')
   })
 
   it('pending while a proposal exists', () => {

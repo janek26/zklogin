@@ -1,5 +1,5 @@
 import type { Address, Hex } from 'viem'
-import { concatHex, encodeAbiParameters, encodeFunctionData, getAddress, isAddress, isHex, keccak256, pad, parseAbi, size, toHex, zeroAddress } from 'viem'
+import { concatHex, encodeAbiParameters, encodeFunctionData, getAddress, isAddress, isHex, keccak256, pad, parseAbi, size, toHex, zeroAddress, zeroHash } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
 
 // ---------------------------------------------------------------------------
@@ -234,12 +234,19 @@ export function assertChecksummedAddress(value: string): Address {
 // Pure view-model helpers (unit-testable without a DOM)
 // ---------------------------------------------------------------------------
 
-export type RecoverySurfaceKind = 'absent' | 'pending' | 'unsafe'
+export type RecoverySurfaceKind = 'absent' | 'pending' | 'unsafe' | 'none'
 
-/** Maps on-chain recovery state to the dashboard banner surface. */
+/**
+ * Maps on-chain recovery state to the dashboard banner surface. A wallet
+ * with a guardian installed shows no banner ('none'); otherwise absent →
+ * setup prompt, pending proposal → cancel banner, permanent local owner →
+ * unsafe warning. `guardianNullifier` is bytes32, so it must be compared
+ * against the 32-byte zero (never the 20-byte zeroAddress).
+ */
 export function recoverySurfaceKind(state: RecoveryAccountState): RecoverySurfaceKind {
   if (state.permanentOwner !== zeroAddress) return 'unsafe'
   if (state.recovery.proposedOwner !== zeroAddress) return 'pending'
+  if (state.guardianNullifier !== zeroHash) return 'none'
   return 'absent'
 }
 

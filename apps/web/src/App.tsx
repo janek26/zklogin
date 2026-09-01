@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import type { Address, Hex } from 'viem'
-import { getAddress, isAddress, parseEther, zeroAddress } from 'viem'
+import { getAddress, isAddress, parseEther, zeroAddress, zeroHash } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import { createWalletClients, entryPoint, kernelVersion, publicClient, waitForSuccess } from './aa/client'
 import { makeActivationCallData, makeActivationInnerData, toZkLoginKernelValidator, type ProofAuth } from './aa/zkLoginValidator'
@@ -18,6 +18,7 @@ import { sendReducer } from './lib/reducer'
 import { shortAddress, requireBytes32, READY_KEY, PRELOGIN_KEY } from './lib/utils'
 import { loadOrCreatePreLogin, assertActivated } from './lib/session'
 import { useRecovery, setGuardianCustomData } from './lib/recoveryView'
+import { recoverySurfaceKind } from './lib/recovery'
 import type { PreLoginSession } from './auth/nonce'
 import { proveInBrowser } from './auth/prove'
 import { parseIdTokenFromFragment, clearFragment } from './auth/googleOAuth'
@@ -276,8 +277,11 @@ export function App() {
 
   const canSend = !sending && !!recipient.trim() && !!amount.trim()
   const recovered = !!recovery.state?.permanentOwner && recovery.state.permanentOwner !== zeroAddress
-  const pending = !!recovery.state?.recovery.proposedOwner && recovery.state.recovery.proposedOwner !== zeroAddress && !recovered
-  const guardianReady = !!recovery.state?.guardianNullifier && recovery.state.guardianNullifier !== zeroAddress && !pending && !recovered
+  // guardianNullifier is bytes32 — the zero bytes32, not the 20-byte zeroAddress.
+  const guardianReady = !!recovery.state?.guardianNullifier
+    && recovery.state.guardianNullifier !== zeroHash
+    && !recovery.state.recovery.proposedOwner
+    && !recovered
   const setupCustomData = wallet && recovery.state
     ? setGuardianCustomData({ chainId: config.chainId, kernelAddress: wallet.account.address, state: recovery.state })
     : ''
@@ -313,14 +317,14 @@ export function App() {
 
         {wallet && !recovered && (
           <>
-            {!guardianReady && !pending && (
+            {recovery.state && recoverySurfaceKind(recovery.state) === 'absent' && (
               <RecoveryBanner
                 kind="absent"
                 onSetup={() => setShowSetup(true)}
                 disabled={recovery.submitting}
               />
             )}
-            {pending && (
+            {recovery.state && recoverySurfaceKind(recovery.state) === 'pending' && (
               <RecoveryBanner
                 kind="pending"
                 proposal={recovery.state?.recovery}

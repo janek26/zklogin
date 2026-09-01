@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Address } from 'viem'
-import { isAddress, zeroAddress } from 'viem'
+import { isAddress, zeroHash } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
 import type { PassportProofResult } from './PassportProofRequest'
 import { PassportProofRequest } from './PassportProofRequest'
@@ -54,7 +54,7 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
     try {
       const address = assertChecksummedAddress(addressInput.trim())
       const s = await readRecoveryState(address)
-      if (s.guardianNullifier === zeroAddress && !s.recovery.proposedOwner) {
+      if (s.guardianNullifier === zeroHash && !s.recovery.proposedOwner) {
         throw new Error('This wallet has no passport recovery')
       }
       setKernelAddress(address)
