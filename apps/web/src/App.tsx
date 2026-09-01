@@ -48,6 +48,11 @@ export function App() {
   const [showRecoveryLogin, setShowRecoveryLogin] = useState(false)
   const proofStart = useRef(0)
   const oauthHandled = useRef(false)
+  // Wallet mirror for stable callbacks: reading the current wallet from a ref
+  // (instead of a useCallback dep) stops the restore effect from re-running
+  // every time setWallet lands a new object.
+  const walletRef = useRef(wallet)
+  walletRef.current = wallet
   const unsupported = !window.Worker || !window.WebAssembly || !window.crypto || typeof BigInt === 'undefined'
   const isMobile = (navigator.maxTouchPoints > 1 && window.matchMedia('(pointer: coarse)').matches)
     || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
@@ -71,9 +76,9 @@ export function App() {
   }, [])
 
   const refreshBalance = useCallback(async (address?: Address) => {
-    const target = address ?? wallet?.account.address
+    const target = address ?? walletRef.current?.account.address
     if (target) setBalance(await publicClient.getBalance({ address: target }))
-  }, [wallet])
+  }, [])
 
   useEffect(() => {
     let cancelled = false
