@@ -12,6 +12,7 @@ import {
   assertChecksummedAddress,
   bindingAsciiHex,
   createLocalRecoveryKey,
+  formatRecoveryDelay,
   loadLocalRecoveryKey,
   makeFinalizeCallData,
   makeProposeCallData,
@@ -215,7 +216,9 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
           <h1>Prove your passport</h1>
           <p>
             Your passport proves you may propose <code>{localKey.address}</code> as the new owner.
-            Recovery waits {formatDelayLabel(state.recoveryDelay)}.
+            {state.recoveryDelay === 0
+              ? 'Recovery happens immediately.'
+              : `Recovery waits ${formatRecoveryDelay(state.recoveryDelay)}.`}
           </p>
           <PassportProofRequest
             action="PROPOSE_RECOVERY"
@@ -270,8 +273,3 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
   )
 }
 
-function formatDelayLabel(seconds: number): string {
-  if (seconds === 0) return 'Immediate'
-  const days = seconds / 86400
-  return `${days} day${days === 1 ? '' : 's'}`
-}

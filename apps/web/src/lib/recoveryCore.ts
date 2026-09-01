@@ -82,6 +82,17 @@ export const RECOVERY_DELAYS = [
 
 export const DEFAULT_RECOVERY_DELAY_SECONDS = 7 * 24 * 60 * 60
 
+/**
+ * Human label for a recovery delay in seconds. The zero case reads as a
+ * noun phrase ("Immediate"), so call sites must phrase the sentence to fit:
+ * "Recovery happens immediately" rather than "Recovery waits Immediate".
+ */
+export function formatRecoveryDelay(seconds: number): string {
+  if (seconds === 0) return 'Immediate'
+  const days = seconds / 86400
+  return Number.isInteger(days) ? `${days} day${days === 1 ? '' : 's'}` : `${seconds}s`
+}
+
 // ---------------------------------------------------------------------------
 // Canonical proof bindings (must match V2 contract _binding + _asciiHex)
 // ---------------------------------------------------------------------------

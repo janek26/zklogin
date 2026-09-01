@@ -1,6 +1,7 @@
 import type { Address } from 'viem'
 import { formatEther } from 'viem'
 import type { RecoveryProposal } from '../lib/recovery'
+import { formatRecoveryDelay } from '../lib/recovery'
 import { shortAddress, formatExpiry } from '../lib/utils'
 
 /**
@@ -51,8 +52,11 @@ export function RecoveryBanner(props: {
           {props.proposedOwner && (
             <p className="recovery-details">
               Proposed owner <code>{shortAddress(props.proposedOwner)}</code>
-              {props.delaySeconds !== undefined && (
-                <> · recovery waits {formatDelay(props.delaySeconds)}</>
+              {props.delaySeconds !== undefined && props.delaySeconds > 0 && (
+                <> · recovery waits {formatRecoveryDelay(props.delaySeconds)}</>
+              )}
+              {props.delaySeconds === 0 && (
+                <> · recovery is immediate</>
               )}
             </p>
           )}
@@ -87,8 +91,3 @@ export function RecoveryBanner(props: {
   )
 }
 
-function formatDelay(seconds: number): string {
-  if (seconds === 0) return 'Immediate'
-  const days = seconds / 86400
-  return Number.isInteger(days) ? `${days} day${days === 1 ? '' : 's'}` : `${seconds}s`
-}

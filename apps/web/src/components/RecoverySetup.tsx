@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { PassportProofAction, PassportProofResult } from './PassportProofRequest'
 import { PassportProofRequest } from './PassportProofRequest'
-import { RECOVERY_DELAYS, DEFAULT_RECOVERY_DELAY_SECONDS, type RecoveryAccountState } from '../lib/recovery'
+import { RECOVERY_DELAYS, DEFAULT_RECOVERY_DELAY_SECONDS, formatRecoveryDelay, type RecoveryAccountState } from '../lib/recovery'
 
 type Step = 1 | 2 | 3
 
@@ -11,12 +11,6 @@ const DELAY_HELP: Record<number, string> = {
   259200: 'The new owner can take over three days after the request. You can cancel in between.',
   604800: 'The new owner can take over one week after the request. You can cancel in between.',
   2592000: 'The new owner can take over 30 days after the request. You can cancel in between.',
-}
-
-function formatWait(seconds: number): string {
-  if (seconds === 0) return 'Immediately'
-  const days = seconds / 86400
-  return `${days} day${days === 1 ? '' : 's'}`
 }
 
 /**
@@ -113,8 +107,8 @@ export function RecoverySetup(props: {
           <h3>Review your choice</h3>
           <div className="setup-summary">
             <div className="setup-summary-row">
-              <span>Recovery waits</span>
-              <strong>{formatWait(delaySeconds)}</strong>
+              <span>{immediate ? 'Recovery timing' : 'Recovery waits'}</span>
+              <strong>{formatRecoveryDelay(delaySeconds)}</strong>
             </div>
             <div className="setup-summary-row">
               <span>Guardian</span>
@@ -173,7 +167,7 @@ export function RecoverySetup(props: {
           <h3>Scan your passport</h3>
           <p className="setup-step-lead">
             Open the ZKPassport app and scan the QR code to prove recovery eligibility.
-            {immediate ? ' Recovery happens immediately after you confirm on your phone.' : ` The new owner can take over after ${formatWait(delaySeconds).toLowerCase()}.`}
+            {immediate ? ' Recovery happens immediately after you confirm on your phone.' : ` The new owner can take over after ${formatRecoveryDelay(delaySeconds).toLowerCase()}.`}
           </p>
           <div className="qr-card">
             <PassportProofRequest
