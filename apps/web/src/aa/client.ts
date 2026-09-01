@@ -40,10 +40,27 @@ export async function createRecoveryWalletClients(validator: KernelValidator<'Re
   return clients
 }
 
+/** Decodes a Solidity `Error(string)` revert payload into its message. */
+export function decodeRevertReason(data: Hex | string): string | null {
+  if (!data || typeof data !== 'string' || !data.startsWith('0x08c379a0')) return null
+  try {
+    const body = data.slice(10)
+    // ABI: selector(4B) + offset(32B) + length(32B) + utf8 bytes (padded)
+    const length = parseInt(body.slice(64, 128), 16)
+    const text = body.slice(128, 128 + length * 2)
+    return Buffer.from(text, 'hex').toString('utf8')
+  } catch {
+    return null
+  }
+}
+
 export async function waitForSuccess(kernelClient: WalletClients['kernelClient'], hash: Hex) {
   // 4s retryInterval (matching client polling) × 45 = up to 3 minutes for the
   // UserOperation to confirm on L1 Sepolia before giving up.
   const receipt = await kernelClient.waitForUserOperationReceipt({ hash, timeout: 180_000, retryCount: 45 })
-  if (!receipt.success) throw new Error('USER_OPERATION_REVERTED')
+  if (!receipt.success) {
+    const reason = decodeRevertReason(receipt.reason ?? '')
+    throw new Error(reason ? `USER_OPERATION_REVERTED: ${reason}` : 'USER_OPERATION_REVERTED')
+  }
   return receipt
 }

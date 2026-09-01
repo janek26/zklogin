@@ -10,6 +10,7 @@ import { Onboarding } from './components/Onboarding'
 import { RecoveryBanner } from './components/RecoveryBanner'
 import { RecoveryLogin } from './components/RecoveryLogin'
 import { RecoverySetup } from './components/RecoverySetup'
+import { Dialog } from './components/ui/dialog'
 import type { PassportProofResult } from './components/PassportProofRequest'
 import { WalletView } from './components/WalletView'
 import type { Stage, Wallet } from './lib/types'
@@ -329,18 +330,6 @@ export function App() {
                 disabled={recovery.submitting}
               />
             )}
-            {showSetup && recovery.state && (
-              <RecoverySetup
-                walletAddress={wallet.account.address}
-                state={recovery.state}
-                rotating={guardianReady}
-                submitting={recovery.submitting}
-                customData={setupCustomData}
-                onProofResult={(result) => { void handleSetupProof(result) }}
-                onProofError={(err) => setError(err)}
-                onCancelSetup={() => setShowSetup(false)}
-              />
-            )}
             <WalletView
               wallet={wallet}
               balance={balance}
@@ -402,6 +391,21 @@ export function App() {
         </div>
       )}
       {copied && <div className="toast" role="status">Address copied</div>}
+
+      {wallet && recovery.state && (
+        <Dialog open={showSetup} onClose={() => setShowSetup(false)} labelledBy="setup-title">
+          <RecoverySetup
+            walletAddress={wallet.account.address}
+            state={recovery.state}
+            rotating={guardianReady}
+            submitting={recovery.submitting}
+            customData={setupCustomData}
+            onProofResult={(result) => { void handleSetupProof(result) }}
+            onProofError={(err) => setError(err)}
+            onCancelSetup={() => setShowSetup(false)}
+          />
+        </Dialog>
+      )}
 
       <footer>Unaudited research POC</footer>
     </main>

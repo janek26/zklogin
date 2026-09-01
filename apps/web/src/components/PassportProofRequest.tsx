@@ -38,7 +38,9 @@ export function PassportProofRequest(props: {
 }) {
   const handleResult = ({ uniqueIdentifier, verified, proofs, sdkInstance }: OnResultResponse) => {
     if (!verified) return
-    const outer = proofs.find((p) => p.name?.startsWith('outer_evm'))
+    // compressed-evm mode returns a single outer proof — per ZKPassport docs,
+    // take proofs[0] directly rather than filtering by name.
+    const outer = proofs[0]
     if (!outer) {
       props.onError('NO_OUTER_EVM_PROOF')
       return
