@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with: { submodules: true }
       - uses: foundry-rs/foundry-toolchain@v1
-      - run: cd contracts && FILES=$(find src test script -name '*.sol' | grep -v UltraVerifier.sol) && forge fmt --check $FILES
+      - run: cd contracts && forge fmt --check
       - run: cd contracts && forge build
       - run: cd contracts && forge test
 
