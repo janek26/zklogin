@@ -30,7 +30,9 @@ export type RecoveryViewModel = {
 }
 
 const POLL_NO_PROPOSAL_MS = 60_000
-const POLL_ACTIVE_MS = 15_000
+// L1 Sepolia confirms at ~12s/block. A 30s poll catches a proposal becoming
+// executable within a couple of blocks without hammering the RPC.
+const POLL_ACTIVE_MS = 30_000
 
 /**
  * Dashboard recovery integration: reads public recovery state, polls on the
@@ -64,6 +66,8 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
     void refresh()
     const interval = setInterval(() => {
       if (document.visibilityState !== 'visible') return
+      // The 15s active-proposal schedule below supersedes the idle poll.
+      if (state?.recovery.proposedOwner && state.recovery.proposedOwner !== zeroAddress) return
       void refresh()
     }, POLL_NO_PROPOSAL_MS)
     const visibleRefresh = () => { if (document.visibilityState === 'visible') void refresh() }
@@ -72,7 +76,7 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
       clearInterval(interval)
       document.removeEventListener('visibilitychange', visibleRefresh)
     }
-  }, [args.enabled, args.kernelAddress, refresh])
+  }, [args.enabled, args.kernelAddress, refresh, state?.recovery.proposedOwner])
 
   // 15s schedule once a proposal exists.
   useEffect(() => {
