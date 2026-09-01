@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { decodeRevertReason } from '../aa/client'
+import { decodeRevertReason } from '../lib/utils'
 
 describe('decodeRevertReason', () => {
   it('decodes the Error(string) payload from the ZKPassport verifier', () => {

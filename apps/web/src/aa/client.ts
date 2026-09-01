@@ -2,9 +2,10 @@ import type { Address, Hex } from 'viem'
 import { createPublicClient, http } from 'viem'
 import { createKernelAccount, createKernelAccountClient, createZeroDevPaymasterClient } from '@zerodev/sdk'
 import { KERNEL_V3_3, getEntryPoint } from '@zerodev/sdk/constants'
-import type { KernelValidator } from '@zerodev/sdk/types'
 import type { KernelAccountClient, CreateKernelAccountReturnType } from '@zerodev/sdk'
+import type { KernelValidator } from '@zerodev/sdk/types'
 import { config } from '../config'
+import { decodeRevertReason } from '../lib/utils'
 
 export const entryPoint = getEntryPoint('0.7')
 export const kernelVersion = KERNEL_V3_3
@@ -38,20 +39,6 @@ export async function createRecoveryWalletClients(validator: KernelValidator<'Re
     throw new Error('KERNEL_ADDRESS_DERIVATION_MISMATCH')
   }
   return clients
-}
-
-/** Decodes a Solidity `Error(string)` revert payload into its message. */
-export function decodeRevertReason(data: Hex | string): string | null {
-  if (!data || typeof data !== 'string' || !data.startsWith('0x08c379a0')) return null
-  try {
-    const body = data.slice(10)
-    // ABI: selector(4B) + offset(32B) + length(32B) + utf8 bytes (padded)
-    const length = parseInt(body.slice(64, 128), 16)
-    const text = body.slice(128, 128 + length * 2)
-    return Buffer.from(text, 'hex').toString('utf8')
-  } catch {
-    return null
-  }
 }
 
 export async function waitForSuccess(kernelClient: WalletClients['kernelClient'], hash: Hex) {
