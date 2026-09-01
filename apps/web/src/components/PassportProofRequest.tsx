@@ -24,6 +24,10 @@ type OnResultResponse = {
  * context, never raw policy configuration. `custom_data` binds the exact
  * canonical recovery hash so the proof cannot be replayed for another
  * action/owner/nonce/wallet.
+ *
+ * Note: the app's global `svg` icon rule is scoped to exclude this widget
+ * (see style.css) so the QR's `fill="currentColor"` svg keeps its own size
+ * and fill instead of being forced to 16px/stroke.
  */
 export function PassportProofRequest(props: {
   action: PassportProofAction
