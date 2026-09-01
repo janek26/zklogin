@@ -334,11 +334,58 @@ h2 {
 
 /* Balance card */
 
-.balance-card {
-  grid-column: 1 / -1;
-  min-height: 240px;
-  padding: 28px;
-  background: linear-gradient(130deg, #1a1a23 0%, #1d1825 100%);
+.balance-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guardian-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid #2f3a2f;
+  border-radius: 999px;
+  background: #17211a;
+  color: #9fd98a;
+  font: 500 11px/1 'DM Mono', monospace;
+  cursor: default;
+}
+
+.guardian-badge svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
+
+.guardian-badge-label { white-space: nowrap; }
+
+.guardian-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  width: 260px;
+  padding: 10px 12px;
+  border: 1px solid #35343e;
+  border-radius: 10px;
+  background: #1d1c25;
+  box-shadow: 0 12px 40px #00000066;
+  color: #c9c7d2;
+  font: 400 12px/1.5 'DM Sans', system-ui, sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+.guardian-badge:hover .guardian-tooltip,
+.guardian-badge:focus .guardian-tooltip,
+.guardian-badge:focus-within .guardian-tooltip {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 .address-button {
@@ -899,22 +946,42 @@ input:focus {
   cursor: pointer;
 }
 
-.qr-card { margin: 4px 0 0; }
-.qr-card p { color: #a5a2b4; font-size: 13px; line-height: 1.55; margin-bottom: 12px; }
-
-.recover-action {
-  margin-top: 14px;
-  color: #777482;
-  font-size: 12px;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: #3a3945;
+.qr-card {
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.recover-action:hover { color: #b6ff6e; text-decoration-color: currentColor; }
+.qr-card p { color: #a5a2b4; font-size: 13px; line-height: 1.55; margin-bottom: 12px; width: 100%; }
 
+/* Center the mobile-format ZKPassport card (max-width 380px) in both the
+   setup dialog and the recovery-login PROOF stage. */
+.qr-card .zkp-card,
+.recovery-login .zkp-card {
+  margin: 16px auto 0;
+}
+
+.recover-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-top: 16px;
+}
+.recover-slot span {
+  color: #5f5c6c;
+  font-size: 11.5px;
+}
+.recover-slot .recover-action { margin-top: 4px; }
+
+.recovery-login {
+  width: min(100%, 500px);
+  padding: 32px;
+  margin: 0 auto;
+}
 .recovery-login h1 { font-size: 24px; letter-spacing: -.03em; margin: 18px 0 10px; }
 .recovery-login .field { margin: 14px 0; }
+.recovery-login .progress-panel { margin-top: 18px; }
 .recovery-countdown {
   font: 600 22px/1 'DM Mono', monospace;
   color: #b6ff6e;

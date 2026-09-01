@@ -59,6 +59,7 @@ function RecoveryEntry() {
         validatorAddress: config.validatorAddress,
         signer,
         kind: 'owner',
+        accountId: state.accountId,
       })
       const clients = await createRecoveryWalletClients(validator as never, kernelAddress)
       const tx = await clients.kernelClient.sendUserOperation({

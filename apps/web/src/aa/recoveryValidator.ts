@@ -61,6 +61,9 @@ export async function toRecoveryKernelValidator(args: {
   validatorAddress: Address
   signer: LocalAccount
   kind: 'proposal' | 'finalize' | 'owner'
+  /** The wallet's accountId — must match the sudo validator's enableData so
+   * the kernel address derivation reproduces the wallet's real address. */
+  accountId: Hex
   proposalAuth?: PassportProposalAuth
   recoveryNonce?: bigint
 }): Promise<KernelValidator<'RecoveryValidator'>> {
@@ -77,7 +80,7 @@ export async function toRecoveryKernelValidator(args: {
     source: 'RecoveryValidator',
     validatorType: 'SECONDARY',
     supportedKernelVersions: args.kernelVersion,
-    async getEnableData() { return encodeAbiParameters([{ type: 'bytes32' }], [toHex(0, { size: 32 })]) },
+    async getEnableData() { return encodeAbiParameters([{ type: 'bytes32' }], [args.accountId]) },
     getIdentifier() { return args.validatorAddress },
     async getNonceKey(_accountAddress, customNonceKey = 0n) { return customNonceKey },
     async isEnabled() { return false },

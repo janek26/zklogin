@@ -347,6 +347,7 @@ export function App() {
               sending={sending}
               spinning={spinning}
               canSend={canSend}
+              recovery={recovery.state}
               onRecipientChange={setRecipient}
               onAmountChange={setAmount}
               onCopyAddress={() => { void copyAddress() }}
@@ -376,6 +377,7 @@ export function App() {
               sending={sending}
               spinning={spinning}
               canSend={canSend}
+              recovery={recovery.state}
               onRecipientChange={setRecipient}
               onAmountChange={setAmount}
               onCopyAddress={() => { void copyAddress() }}

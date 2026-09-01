@@ -99,6 +99,7 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
         validatorAddress: config.validatorAddress,
         signer: { address: localKey.address } as never,
         kind: 'proposal',
+        accountId: state.accountId,
         proposalAuth: auth,
       })
       const callData = makeProposeCallData({
@@ -135,6 +136,7 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
         validatorAddress: config.validatorAddress,
         signer,
         kind: 'finalize',
+        accountId: state.accountId,
         recoveryNonce: state.recovery.nonce,
       })
       const callData = makeFinalizeCallData({

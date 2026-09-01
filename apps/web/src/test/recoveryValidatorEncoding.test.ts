@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { decodeAbiParameters, size, type Hex } from 'viem'
-import { __testOnly } from '../aa/recoveryValidator'
+import { decodeAbiParameters, encodeAbiParameters, size, type Hex } from 'viem'
+import { __testOnly, toRecoveryKernelValidator } from '../aa/recoveryValidator'
 
 describe('recovery validator wire format', () => {
   const params = {
@@ -72,5 +72,23 @@ describe('recovery validator wire format', () => {
     }] as const
     const [auth] = decodeAbiParameters(authAbi, encoded.slice(2) as Hex)
     expect(auth.params.serviceConfig.devMode).toBe(true)
+  })
+
+  it('encodes the wallet accountId as the recovery validator enableData', async () => {
+    // Regression: getEnableData must reproduce the sudo validator's enableData
+    // (abi.encode(accountId)), otherwise the kernel address derivation during
+    // recovery differs from the wallet's real address and every recovery fails
+    // with KERNEL_ADDRESS_DERIVATION_MISMATCH.
+    const accountId = `0x${'ab'.repeat(32)}` as Hex
+    const validator = await toRecoveryKernelValidator({
+      entryPoint: undefined as never,
+      kernelVersion: undefined as never,
+      chainId: 11155111,
+      validatorAddress: owner,
+      signer: { address: owner, type: 'local' } as never,
+      kind: 'owner',
+      accountId,
+    })
+    expect(await validator.getEnableData()).toBe(encodeAbiParameters([{ type: 'bytes32' }], [accountId]))
   })
 })

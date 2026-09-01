@@ -98,11 +98,15 @@ export function Onboarding({
             Continue with Google
           </button>
           <p>A single sign-in activates a 24-hour session.</p>
-          {onRecover && (
-            <button type="button" className="text-button recover-action" onClick={onRecover}>
-              Recover with passport
-            </button>
-          )}
+        </div>
+      )}
+
+      {onRecover && (
+        <div className="recover-slot">
+          <span>Lost access to Google?</span>
+          <button type="button" className="text-button recover-action" onClick={onRecover}>
+            Recover with passport
+          </button>
         </div>
       )}
 

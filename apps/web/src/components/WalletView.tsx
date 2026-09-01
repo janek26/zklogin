@@ -3,6 +3,8 @@ import { formatEther } from 'viem'
 import type { Wallet } from '../lib/types'
 import { shortAddress, formatExpiry } from '../lib/utils'
 import { config } from '../config'
+import type { RecoveryAccountState } from '../lib/recovery'
+import { formatRecoveryDelay } from '../lib/recovery'
 import { ArrowIcon, CopyIcon, RefreshIcon } from './Icons'
 
 export function WalletView({
@@ -17,6 +19,7 @@ export function WalletView({
   sending,
   spinning,
   canSend,
+  recovery,
   onRecipientChange,
   onAmountChange,
   onCopyAddress,
@@ -34,12 +37,18 @@ export function WalletView({
   sending: boolean
   spinning: boolean
   canSend: boolean
+  recovery?: RecoveryAccountState | null
   onRecipientChange: (value: string) => void
   onAmountChange: (value: string) => void
   onCopyAddress: () => void
   onRefresh: () => void
   onSend: () => void
 }) {
+  const guardian = recovery?.guardianNullifier
+    && recovery.guardianNullifier !== '0x0000000000000000000000000000000000000000000000000000000000000000'
+    ? recovery
+    : null
+
   return (
     <div className="wallet-grid">
       <section className="balance-card card">
@@ -51,13 +60,29 @@ export function WalletView({
               <CopyIcon />
             </button>
           </div>
-          <button
-            className={`icon-button${spinning ? ' spin-once' : ''}`}
-            onClick={onRefresh}
-            title="Refresh balance"
-          >
-            <RefreshIcon />
-          </button>
+          <div className="balance-header-actions">
+            {guardian && (
+              <span className="guardian-badge" tabIndex={0} role="img" aria-label="Passport recovery enabled">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2l8 3v6c0 5.05-3.41 9.76-8 11-4.59-1.24-8-5.95-8-11V5l8-3zm0 2.3L6 6.7V11c0 4.15 2.72 7.9 6 8.95 3.28-1.05 6-4.8 6-8.95V6.7l-6-2.4zm-.75 9.2l-2.4-2.4 1.06-1.06 1.34 1.34 3.2-3.2 1.06 1.06-4.26 4.26z" fill="currentColor" />
+                </svg>
+                <span className="guardian-badge-label">Passport recovery</span>
+                <span className="guardian-tooltip" role="tooltip">
+                  This wallet can be recovered with your passport.
+                  {guardian.recoveryDelay > 0
+                    ? ` Recovery waits ${formatRecoveryDelay(guardian.recoveryDelay)}.`
+                    : ' Recovery happens immediately.'}
+                </span>
+              </span>
+            )}
+            <button
+              className={`icon-button${spinning ? ' spin-once' : ''}`}
+              onClick={onRefresh}
+              title="Refresh balance"
+            >
+              <RefreshIcon />
+            </button>
+          </div>
         </div>
         <div className="balance-value">{formatEther(balance)}<span> ETH</span></div>
         <div className="balance-meta">
