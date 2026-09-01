@@ -339,7 +339,8 @@ contract ZkLoginKernelValidatorV2Test is Test {
         params.serviceConfig.devMode = true;
         // devMode=true is allowed for real passports, but the Sepolia registry
         // contains ZKR mock certs, so both mock nullifier types must stay rejected.
-        params.proofVerificationData.publicInputs[
+        params.proofVerificationData
+        .publicInputs[
             params.proofVerificationData.publicInputs.length - 3
         ] = bytes32(uint256(2)); // NON_SALTED_MOCK_NULLIFIER
         uint48 delay = validator.DELAY_7_DAYS();
@@ -348,7 +349,8 @@ contract ZkLoginKernelValidatorV2Test is Test {
         kernel.setGuardian(validator, params, delay);
 
         // SALTED_MOCK_NULLIFIER (3) must be rejected too.
-        params.proofVerificationData.publicInputs[
+        params.proofVerificationData
+        .publicInputs[
             params.proofVerificationData.publicInputs.length - 3
         ] = bytes32(uint256(3));
         vm.expectRevert(bytes("MOCK_PROOF"));
@@ -362,7 +364,8 @@ contract ZkLoginKernelValidatorV2Test is Test {
         ProofVerificationParams memory params = passportParams(cd);
         params.serviceConfig.devMode = true;
         // NON_SALTED_NULLIFIER (0) is a real passport — must be accepted.
-        params.proofVerificationData.publicInputs[
+        params.proofVerificationData
+        .publicInputs[
             params.proofVerificationData.publicInputs.length - 3
         ] = bytes32(uint256(0));
         uint48 delay = validator.DELAY_7_DAYS();

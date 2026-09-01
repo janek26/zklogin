@@ -342,12 +342,10 @@ contract ZkLoginKernelValidatorV2 is IValidator {
         // contains ZKR mock certs, so devMode must not unlock mock guardians.
         if (params.serviceConfig.devMode) {
             uint256 nullifierType = uint256(
-                params.proofVerificationData.publicInputs[params.proofVerificationData.publicInputs.length - 3]
+                params.proofVerificationData
+                .publicInputs[params.proofVerificationData.publicInputs.length - 3]
             );
-            require(
-                nullifierType != 2 && nullifierType != 3,
-                "MOCK_PROOF"
-            );
+            require(nullifierType != 2 && nullifierType != 3, "MOCK_PROOF");
         }
         require(
             params.serviceConfig.validityPeriodInSeconds == PASSPORT_VALIDITY,
