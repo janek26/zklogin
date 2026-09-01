@@ -337,7 +337,18 @@ contract ZkLoginKernelValidatorV2 is IValidator {
         address kernel,
         bytes32 expectedBinding
     ) internal view returns (bytes32) {
-        require(!params.serviceConfig.devMode, "DEV_MODE");
+        // devMode=true selects the Sepolia certificate registry in the ZKPassport
+        // SDK, but mock-passport nullifiers must stay rejected: the Sepolia registry
+        // contains ZKR mock certs, so devMode must not unlock mock guardians.
+        if (params.serviceConfig.devMode) {
+            uint256 nullifierType = uint256(
+                params.proofVerificationData.publicInputs[params.proofVerificationData.publicInputs.length - 3]
+            );
+            require(
+                nullifierType != 2 && nullifierType != 3,
+                "MOCK_PROOF"
+            );
+        }
         require(
             params.serviceConfig.validityPeriodInSeconds == PASSPORT_VALIDITY,
             "VALIDITY"

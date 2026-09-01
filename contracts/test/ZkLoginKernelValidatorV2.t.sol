@@ -331,16 +331,47 @@ contract ZkLoginKernelValidatorV2Test is Test {
         kernel.setGuardian(validator, params, delay);
     }
 
-    function test_rejectsDevMode() public {
+    function test_rejectsMockNullifierInDevMode() public {
         bytes32 binding = setGuardianBinding(0);
         string memory cd = ascii(binding);
         armPassport(kernelAddress, cd);
         ProofVerificationParams memory params = passportParams(cd);
         params.serviceConfig.devMode = true;
+        // devMode=true is allowed for real passports, but the Sepolia registry
+        // contains ZKR mock certs, so both mock nullifier types must stay rejected.
+        params.proofVerificationData.publicInputs[
+            params.proofVerificationData.publicInputs.length - 3
+        ] = bytes32(uint256(2)); // NON_SALTED_MOCK_NULLIFIER
         uint48 delay = validator.DELAY_7_DAYS();
 
-        vm.expectRevert(bytes("DEV_MODE"));
+        vm.expectRevert(bytes("MOCK_PROOF"));
         kernel.setGuardian(validator, params, delay);
+
+        // SALTED_MOCK_NULLIFIER (3) must be rejected too.
+        params.proofVerificationData.publicInputs[
+            params.proofVerificationData.publicInputs.length - 3
+        ] = bytes32(uint256(3));
+        vm.expectRevert(bytes("MOCK_PROOF"));
+        kernel.setGuardian(validator, params, delay);
+    }
+
+    function test_acceptsRealPassportInDevMode() public {
+        bytes32 binding = setGuardianBinding(0);
+        string memory cd = ascii(binding);
+        armPassport(kernelAddress, cd);
+        ProofVerificationParams memory params = passportParams(cd);
+        params.serviceConfig.devMode = true;
+        // NON_SALTED_NULLIFIER (0) is a real passport — must be accepted.
+        params.proofVerificationData.publicInputs[
+            params.proofVerificationData.publicInputs.length - 3
+        ] = bytes32(uint256(0));
+        uint48 delay = validator.DELAY_7_DAYS();
+
+        kernel.setGuardian(validator, params, delay);
+
+        (,,, bytes32 stored,, uint64 nonce,,,) = validator.accountState(kernelAddress);
+        assertEq(stored, nullifier, "real devMode passport must set guardian");
+        assertEq(nonce, 1, "guardian nonce must bump");
     }
 
     function test_rejectsWrongDomain() public {

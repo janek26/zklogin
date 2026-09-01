@@ -16,7 +16,9 @@ type OnResultResponse = {
   uniqueIdentifier: string | undefined
   verified: boolean
   proofs: ProofResult[]
-  sdkInstance: { getSolidityVerifierParameters: (args: { proof: ProofResult; scope: string }) => SolidityVerifierParameters }
+  sdkInstance: {
+    getSolidityVerifierParameters: (args: { proof: ProofResult; scope: string; devMode?: boolean }) => SolidityVerifierParameters
+  }
 }
 
 /**
@@ -24,6 +26,12 @@ type OnResultResponse = {
  * context, never raw policy configuration. `custom_data` binds the exact
  * canonical recovery hash so the proof cannot be replayed for another
  * action/owner/nonce/wallet.
+ *
+ * devMode=true selects the Sepolia certificate registry in the ZKPassport
+ * SDK (the app embeds `dev=1` in the QR), which is the only registry whose
+ * root the Sepolia-deployed verifier accepts. The on-chain validator accepts
+ * devMode proofs for real passports but still rejects mock-passport nullifiers,
+ * since the Sepolia registry contains ZKR mock certs.
  *
  * Note: the app's global `svg` icon rule is scoped to exclude this widget
  * (see style.css) so the QR's `fill="currentColor"` svg keeps its own size
@@ -49,7 +57,10 @@ export function PassportProofRequest(props: {
       props.onError('NO_OUTER_EVM_PROOF')
       return
     }
-    const verifierParams = sdkInstance.getSolidityVerifierParameters({ proof: outer, scope: 'policy-1:1' })
+    // devMode: true mirrors the `dev=1` embedded in the QR so
+    // serviceConfig.devMode=true reaches the contract, selecting the Sepolia
+    // certificate registry in the SDK's verifier-params builder.
+    const verifierParams = sdkInstance.getSolidityVerifierParameters({ proof: outer, scope: 'policy-1:1', devMode: true })
     // Console visibility: the embedded certificate/circuit registry roots and
     // proof date are what the on-chain verifier checks first.
     console.log('[passport] proof result', {
@@ -86,6 +97,7 @@ export function PassportProofRequest(props: {
     <ZKPassportQRCode
       domain="zklogin-poc.rahrt.com"
       mode="compressed-evm"
+      devMode
       query={(builder: QueryBuilder): QueryBuilderResult =>
         builder
           .policy('policy-1')

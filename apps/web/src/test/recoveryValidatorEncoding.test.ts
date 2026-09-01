@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { size } from 'viem'
+import { decodeAbiParameters, size, type Hex } from 'viem'
 import { __testOnly } from '../aa/recoveryValidator'
 
 describe('recovery validator wire format', () => {
@@ -39,5 +39,38 @@ describe('recovery validator wire format', () => {
   it('builds mode-0x03 exact finalize call data', () => {
     const call = __testOnly.makeFinalizeCallData({ validatorAddress: owner, recoveryNonce: 1n })
     expect(call).toMatch(/^0x/)
+  })
+  it('carries devMode=true in the proposal auth serviceConfig tuple', () => {
+    const devModeParams = {
+      version: `0x${'01'.repeat(32)}`,
+      proofVerificationData: { vkeyHash: `0x${'02'.repeat(32)}`, proof: '0xdeadbeef', publicInputs: [`0x${'03'.repeat(32)}`] },
+      committedInputs: '0xaabb',
+      serviceConfig: { validityPeriodInSeconds: 604800, domain: 'zklogin-poc.rahrt.com', scope: 'policy-1:1', devMode: true },
+    } as never
+    const encoded = __testOnly.encodeProposalMode({ params: devModeParams, proposedOwner: owner, recoveryNonce: 1n })
+    const authAbi = [{
+      type: 'tuple',
+      components: [
+        { name: 'params', type: 'tuple', components: [
+          { name: 'version', type: 'bytes32' },
+          { name: 'proofVerificationData', type: 'tuple', components: [
+            { name: 'vkeyHash', type: 'bytes32' },
+            { name: 'proof', type: 'bytes' },
+            { name: 'publicInputs', type: 'bytes32[]' },
+          ] },
+          { name: 'committedInputs', type: 'bytes' },
+          { name: 'serviceConfig', type: 'tuple', components: [
+            { name: 'validityPeriodInSeconds', type: 'uint256' },
+            { name: 'domain', type: 'string' },
+            { name: 'scope', type: 'string' },
+            { name: 'devMode', type: 'bool' },
+          ] },
+        ] },
+        { name: 'proposedOwner', type: 'address' },
+        { name: 'recoveryNonce', type: 'uint64' },
+      ],
+    }] as const
+    const [auth] = decodeAbiParameters(authAbi, encoded.slice(2) as Hex)
+    expect(auth.params.serviceConfig.devMode).toBe(true)
   })
 })
