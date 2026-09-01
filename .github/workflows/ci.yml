@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { submodules: true }
-      - run: cd contracts && forge fmt --check $(find src test script -name '*.sol' ! -name 'UltraVerifier.sol')
+      - run: cd contracts && FILES=$(find src test script -name '*.sol' | grep -v UltraVerifier.sol) && forge fmt --check $FILES
       - run: cd contracts && forge build
       - run: cd contracts && forge test
 
