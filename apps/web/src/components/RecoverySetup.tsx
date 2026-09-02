@@ -165,8 +165,11 @@ export function RecoverySetup(props: {
         <div className="setup-step-body">
           <h3>ZKPassport</h3>
           <p className="setup-step-lead">
-            Open the ZKPassport app and scan the QR code to prove recovery eligibility.
-            {immediate ? ' Recovery happens immediately after you confirm on your phone.' : ` The new owner can take over after ${formatRecoveryDelay(delaySeconds).toLowerCase()}.`}
+            Open the ZKPassport app and scan the QR code to enroll your passport as this
+            wallet&rsquo;s recovery guardian.
+            {immediate
+              ? ' If you ever need to recover, your passport can take over immediately — no waiting period.'
+              : ` If you ever need to recover, the new owner can take over after ${formatRecoveryDelay(delaySeconds).toLowerCase()}.`}
           </p>
           <div className="qr-card">
             <PassportProofRequest
