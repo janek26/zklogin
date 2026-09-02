@@ -7,7 +7,7 @@ import { RecoveryLogin } from './components/RecoveryLogin'
 import { RefreshIcon } from './components/Icons'
 import { createRecoveredWalletClients, publicClient, waitForSuccess } from './aa/client'
 import { config } from './config'
-import { loadRecoveredWallet, rememberRecoveredWallet } from './lib/recovery'
+import { findRecoveredWalletCandidates, loadRecoveredWallet, rememberRecoveredWallet } from './lib/recovery'
 import './style.css'
 
 /**
@@ -28,20 +28,26 @@ function RecoveryEntry() {
   const clientsRef = useRef<Awaited<ReturnType<typeof createRecoveredWalletClients>> | null>(null)
 
   // Refresh restore: if this browser holds the owner key of a finalized
-  // recovery, go straight to the wallet instead of the login screen.
+  // recovery, go straight to the wallet instead of the login screen. Prefer
+  // the marker, then scan stored recovery keys (pre-marker recoveries).
   useEffect(() => {
     let cancelled = false
     void (async () => {
-      const marker = loadRecoveredWallet(config.chainId)
-      if (!marker) return
-      try {
-        const clients = await createRecoveredWalletClients(marker)
-        if (cancelled) return
-        clientsRef.current = clients
-        setKernelAddress(marker)
-        setBalance(await publicClient.getBalance({ address: marker }))
-      } catch {
-        // No owner key for the marker — fall back to the recovery login.
+      const candidates = loadRecoveredWallet(config.chainId)
+        ? [loadRecoveredWallet(config.chainId)!]
+        : findRecoveredWalletCandidates(config.chainId)
+      for (const kernel of candidates) {
+        try {
+          const clients = await createRecoveredWalletClients(kernel)
+          if (cancelled) return
+          rememberRecoveredWallet(config.chainId, kernel)
+          clientsRef.current = clients
+          setKernelAddress(kernel)
+          setBalance(await publicClient.getBalance({ address: kernel }))
+          return
+        } catch {
+          // No owner key for this candidate — try the next.
+        }
       }
     })()
     return () => { cancelled = true }

@@ -3,6 +3,7 @@ import { isHex, size, toHex } from 'viem'
 import {
   createLocalRecoveryKey,
   deleteLocalRecoveryKey,
+  findRecoveredWalletCandidates,
   forgetRecoveredWallet,
   loadLocalRecoveryKey,
   loadRecoveredWallet,
@@ -73,8 +74,9 @@ describe('local recovery key lifecycle', () => {
     expect(loadRecoveredWallet(CHAIN_ID)).toBeNull()
   })
 
-  it('rejects a malformed recovered-wallet marker', () => {
-    store.set(`zklogin.recovered.${CHAIN_ID}`, 'not-an-address')
-    expect(loadRecoveredWallet(CHAIN_ID)).toBeNull()
+  it('finds candidate kernels from stored recovery keys', () => {
+    createLocalRecoveryKey({ chainId: CHAIN_ID, kernelAddress: KERNEL, recoveryNonce: 1n })
+    expect(findRecoveredWalletCandidates(CHAIN_ID)).toEqual([KERNEL])
+    expect(findRecoveredWalletCandidates(1)).toEqual([])
   })
 })

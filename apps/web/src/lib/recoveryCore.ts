@@ -265,6 +265,30 @@ export function forgetRecoveredWallet(chainId: number): void {
   localStorage.removeItem(recoveredWalletKey(chainId))
 }
 
+const RECOVERY_KEY_PREFIX = 'zklogin.recovery.'
+
+/**
+ * Lists every kernel that has a stored local recovery key on this chain, by
+ * scanning localStorage. This is the fallback when the recovered-wallet marker
+ * is absent (e.g. a recovery finalized before the marker existed): the keys
+ * themselves are authoritative for "this browser can act as the owner".
+ */
+export function findRecoveredWalletCandidates(chainId: number): Address[] {
+  const prefix = `${RECOVERY_KEY_PREFIX}${chainId}.`
+  const kernels = new Set<Address>()
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i)
+      if (!key || !key.startsWith(prefix)) continue
+      // zklogin.recovery.<chainId>.<kernel>.<nonce>
+      const rest = key.slice(prefix.length)
+      const kernel = rest.slice(0, rest.indexOf('.'))
+      if (kernel && isAddress(kernel)) kernels.add(getAddress(kernel))
+    }
+  } catch { /* no-op */ }
+  return [...kernels]
+}
+
 // ---------------------------------------------------------------------------
 // Validation helpers
 // ---------------------------------------------------------------------------

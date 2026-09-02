@@ -18,7 +18,7 @@ import { sendReducer } from './lib/reducer'
 import { shortAddress, requireBytes32, READY_KEY, PRELOGIN_KEY } from './lib/utils'
 import { loadOrCreatePreLogin, assertActivated } from './lib/session'
 import { useRecovery, setGuardianCustomData } from './lib/recoveryView'
-import { forgetRecoveredWallet, loadRecoveredWallet, recoverySurfaceKind, rememberRecoveredWallet } from './lib/recovery'
+import { findRecoveredWalletCandidates, forgetRecoveredWallet, loadRecoveredWallet, recoverySurfaceKind, rememberRecoveredWallet } from './lib/recovery'
 import type { PreLoginSession } from './auth/nonce'
 import { proveInBrowser } from './auth/prove'
 import { parseIdTokenFromFragment, clearFragment } from './auth/googleOAuth'
@@ -103,19 +103,24 @@ export function App() {
     async function restore() {
       const raw = sessionStorage.getItem(READY_KEY)
       if (!raw) {
-        // No Google session: if this browser holds the owner key of a wallet
-        // finalized through passport recovery, restore that dashboard instead.
-        const recoveredKernel = loadRecoveredWallet(config.chainId)
-        if (recoveredKernel) {
+        // No Google session: restore the local-owner dashboard if this browser
+        // holds the owner key of a wallet finalized through passport recovery.
+        // Prefer the marker; fall back to scanning stored recovery keys (covers
+        // recoveries finalized before the marker existed).
+        const candidates = loadRecoveredWallet(config.chainId)
+          ? [loadRecoveredWallet(config.chainId)!]
+          : findRecoveredWalletCandidates(config.chainId)
+        for (const kernel of candidates) {
           try {
-            const recovered = await createRecoveredWalletClients(recoveredKernel)
+            const recovered = await createRecoveredWalletClients(kernel)
+            rememberRecoveredWallet(config.chainId, kernel)
             if (!cancelled) { setWallet(recovered); setStage('READY'); await refreshBalance(recovered.account.address) }
             return
           } catch {
-            // Stale marker (key transferred out / forgotten) — fall through.
-            if (!cancelled) forgetRecoveredWallet(config.chainId)
+            // Not a finalized wallet (or key no longer valid) — try the next.
           }
         }
+        if (loadRecoveredWallet(config.chainId)) forgetRecoveredWallet(config.chainId)
         if (!cancelled) setStage('GOOGLE_READY')
         return
       }
