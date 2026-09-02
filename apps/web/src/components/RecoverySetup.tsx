@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import type { PassportProofAction, PassportProofResult } from './PassportProofRequest'
 import { PassportProofRequest } from './PassportProofRequest'
 import { RECOVERY_DELAYS, DEFAULT_RECOVERY_DELAY_SECONDS, formatRecoveryDelay, type RecoveryAccountState } from '../lib/recovery'
@@ -28,7 +28,6 @@ export function RecoverySetup(props: {
   error?: string | null
   onProofResult: (result: PassportProofResult) => void
   onProofError: (error: string) => void
-  onCancelSetup: () => void
 }) {
   const [step, setStep] = useState<Step>(1)
   const [delaySeconds, setDelaySeconds] = useState<number>(
@@ -40,7 +39,7 @@ export function RecoverySetup(props: {
 
   const immediate = delaySeconds === 0
   const action: PassportProofAction = 'SET_GUARDIAN'
-  const stepTitles = ['Recovery time', 'Review', 'Scan passport']
+  const stepTitles = ['Recovery time', 'Review', 'ZKPassport']
 
   return (
     <section className="recovery-setup card">
@@ -51,19 +50,19 @@ export function RecoverySetup(props: {
           </p>
           <h2>Passport guardian</h2>
         </div>
-        <button className="text-button" onClick={props.onCancelSetup} disabled={props.submitting}>
-          Close
-        </button>
       </div>
 
       <ol className="setup-steps" aria-label="Setup steps">
         {stepTitles.map((title, index) => {
           const n = (index + 1) as Step
           return (
-            <li key={n} className={n === step ? 'current' : n < step ? 'done' : ''}>
-              <span className="setup-step-dot">{n < step ? '✓' : n}</span>
-              <span className="setup-step-label">{title}</span>
-            </li>
+            <Fragment key={n}>
+              {index > 0 && <li className="setup-step-line" aria-hidden="true" />}
+              <li className={n === step ? 'current' : n < step ? 'done' : ''}>
+                <span className="setup-step-dot">{n < step ? '✓' : n}</span>
+                <span className="setup-step-label">{title}</span>
+              </li>
+            </Fragment>
           )
         })}
       </ol>
@@ -164,7 +163,7 @@ export function RecoverySetup(props: {
 
       {step === 3 && (
         <div className="setup-step-body">
-          <h3>Scan your passport</h3>
+          <h3>ZKPassport</h3>
           <p className="setup-step-lead">
             Open the ZKPassport app and scan the QR code to prove recovery eligibility.
             {immediate ? ' Recovery happens immediately after you confirm on your phone.' : ` The new owner can take over after ${formatRecoveryDelay(delaySeconds).toLowerCase()}.`}

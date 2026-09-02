@@ -820,6 +820,7 @@ input:focus {
 
 .setup-steps {
   display: flex;
+  align-items: center;
   gap: 0;
   margin: 16px 0 4px;
   padding: 0;
@@ -829,14 +830,13 @@ input:focus {
   display: flex;
   align-items: center;
   gap: 7px;
-  flex: 1;
+  flex-shrink: 0;
   color: #55525f;
 }
-.setup-steps li + li::before {
-  content: '';
-  flex: 1;
+.setup-steps .setup-step-line {
+  flex: 1 1 auto;
   height: 1px;
-  margin-right: 10px;
+  margin: 0 10px;
   background: #26242f;
 }
 .setup-steps li.done { color: #b6ff6e; }
