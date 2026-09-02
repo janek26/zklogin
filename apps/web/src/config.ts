@@ -49,7 +49,7 @@ export const config = Object.freeze({
   // Kernel factory salt. Bump to force every wallet to a fresh address: stored
   // sessions stop deriving (KERNEL_ADDRESS_DERIVATION_MISMATCH → reset), so all
   // users get a clean wallet with no legacy-state handling.
-  walletSalt: 1n,
+  walletSalt: 2n,
   redirectOrigin: (redirectUrl && redirectUrl !== 'window.location.origin')
     ? redirectUrl
     : window.location.origin,

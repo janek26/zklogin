@@ -399,7 +399,14 @@ export function App() {
             <RecoveryBanner
               kind="unsafe"
               balance={balance}
-              onForget={() => { void recovery.forgetLocalKey() }}
+              onForget={() => {
+                void (async () => {
+                  await recovery.forgetLocalKey()
+                  // The browser no longer holds the owner key — leave the
+                  // dashboard so the next action starts from the landing page.
+                  reset()
+                })()
+              }}
               disabled={recovery.submitting}
             />
             <WalletView

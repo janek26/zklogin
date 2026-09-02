@@ -535,7 +535,7 @@ input:focus {
 
 /* Icons */
 
-.app-shell svg:not(.zkp-card svg):not(svg[data-zkp]) {
+.app-shell svg:not(.zkp-card svg):not(svg[data-zkp]):not(.session-ring):not(.session-info-top svg) {
   width: 16px;
   height: 16px;
   fill: none;
