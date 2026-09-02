@@ -334,6 +334,13 @@ h2 {
 
 /* Balance card */
 
+.balance-card {
+  grid-column: 1 / -1;
+  min-height: 240px;
+  padding: 28px;
+  background: linear-gradient(130deg, #1a1a23 0%, #1d1825 100%);
+}
+
 .balance-header-actions {
   display: flex;
   align-items: center;
@@ -988,6 +995,21 @@ input:focus {
   margin: 18px 0;
 }
 .recovery-done { text-align: center; padding: 32px 0; }
+
+.tx-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #b6ff6e;
+  font: 500 12px/1 'DM Mono', monospace;
+  text-decoration: none;
+  border-bottom: 1px solid #3f5a3a;
+  padding-bottom: 2px;
+  transition: opacity .15s;
+}
+.tx-link:hover { opacity: .8; }
+.progress-panel .tx-link { margin-top: 4px; }
+
+.recovery-open-wallet { margin-top: 18px; }
 
 /* Dialog */
 

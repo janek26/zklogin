@@ -11,6 +11,7 @@ import {
   ACTION_SET_GUARDIAN,
   bindingAsciiHex,
   deleteLocalRecoveryKey,
+  forgetRecoveredWallet,
   makeCancelInnerData,
   makeClearGuardianInnerData,
   makeSetGuardianInnerData,
@@ -172,7 +173,7 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
   }, [args.wallet, runOp])
 
   const forgetLocalKey = useCallback(async () => {
-    if (!args.kernelAddress || !state?.recovery) return
+    if (!args.kernelAddress || !state) return
     const confirmed = window.confirm(
       'This permanently deletes the browser-only recovery key for this wallet. ' +
       'The wallet must already be empty — otherwise its funds become unrecoverable. Continue?',
@@ -181,8 +182,9 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
     deleteLocalRecoveryKey({
       chainId: config.chainId,
       kernelAddress: args.kernelAddress,
-      recoveryNonce: state.recovery.nonce,
+      recoveryNonce: state.recoveryNonce,
     })
+    forgetRecoveredWallet(config.chainId)
     await refresh()
   }, [args.kernelAddress, state, refresh])
 

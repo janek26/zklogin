@@ -2,7 +2,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import type { Address, Hex } from 'viem'
 import { getAddress, isAddress, parseEther, zeroAddress, zeroHash } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
-import { createWalletClients, entryPoint, kernelVersion, publicClient, waitForSuccess } from './aa/client'
+import { createRecoveredWalletClients, createWalletClients, entryPoint, kernelVersion, publicClient, waitForSuccess } from './aa/client'
 import { makeActivationCallData, makeActivationInnerData, toZkLoginKernelValidator, type ProofAuth } from './aa/zkLoginValidator'
 import { validateGoogleCredential } from './auth/validateJwt'
 import { config } from './config'
@@ -18,7 +18,7 @@ import { sendReducer } from './lib/reducer'
 import { shortAddress, requireBytes32, READY_KEY, PRELOGIN_KEY } from './lib/utils'
 import { loadOrCreatePreLogin, assertActivated } from './lib/session'
 import { useRecovery, setGuardianCustomData } from './lib/recoveryView'
-import { recoverySurfaceKind } from './lib/recovery'
+import { forgetRecoveredWallet, loadRecoveredWallet, recoverySurfaceKind, rememberRecoveredWallet } from './lib/recovery'
 import type { PreLoginSession } from './auth/nonce'
 import { proveInBrowser } from './auth/prove'
 import { parseIdTokenFromFragment, clearFragment } from './auth/googleOAuth'
@@ -82,11 +82,43 @@ export function App() {
     if (target) setBalance(await publicClient.getBalance({ address: target }))
   }, [])
 
+  // After passport recovery finalizes, take control of the recovered wallet
+  // with the browser-local owner key and drop into the dashboard (the unsafe
+  // banner explains the local-key custody).
+  const takeOverRecoveredWallet = useCallback(async (kernelAddress: Address) => {
+    try {
+      const recovered = await createRecoveredWalletClients(kernelAddress)
+      rememberRecoveredWallet(config.chainId, kernelAddress)
+      setWallet(recovered)
+      setShowRecoveryLogin(false)
+      setStage('READY')
+      await refreshBalance(recovered.account.address)
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'RECOVERED_WALLET_FAILED')
+    }
+  }, [refreshBalance])
+
   useEffect(() => {
     let cancelled = false
     async function restore() {
       const raw = sessionStorage.getItem(READY_KEY)
-      if (!raw) { if (!cancelled) setStage('GOOGLE_READY'); return }
+      if (!raw) {
+        // No Google session: if this browser holds the owner key of a wallet
+        // finalized through passport recovery, restore that dashboard instead.
+        const recoveredKernel = loadRecoveredWallet(config.chainId)
+        if (recoveredKernel) {
+          try {
+            const recovered = await createRecoveredWalletClients(recoveredKernel)
+            if (!cancelled) { setWallet(recovered); setStage('READY'); await refreshBalance(recovered.account.address) }
+            return
+          } catch {
+            // Stale marker (key transferred out / forgotten) — fall through.
+            if (!cancelled) forgetRecoveredWallet(config.chainId)
+          }
+        }
+        if (!cancelled) setStage('GOOGLE_READY')
+        return
+      }
       try {
         const stored = JSON.parse(raw) as { version: number; privateKey: Hex; sessionKey: string; validUntil: number; randomness: Hex; accountId: Hex; kernelAddress: string }
         if (stored.version !== 1 || !isAddress(stored.sessionKey) || stored.validUntil <= Math.floor(Date.now() / 1000)) throw new Error('INVALID_STORED_SESSION')
@@ -312,7 +344,7 @@ export function App() {
         )}
 
         {!wallet && showRecoveryLogin && (
-          <RecoveryLogin onRecovered={(kernel) => { void refreshBalance(kernel) }} />
+          <RecoveryLogin onRecovered={(kernel) => { void takeOverRecoveredWallet(kernel) }} />
         )}
 
         {wallet && !recovered && (

@@ -41,6 +41,37 @@ export async function createRecoveryWalletClients(validator: KernelValidator<'Re
   return clients
 }
 
+/**
+ * Reconstructs a finalized (recovered) wallet in owner mode: reads the
+ * on-chain state, loads the browser-local owner key, and derives the Kernel
+ * with the mode-0x04 owner validator. Throws NO_PERMANENT_OWNER /
+ * LOCAL_KEY_MISSING / KERNEL_ADDRESS_DERIVATION_MISMATCH when the wallet is
+ * not actually recoverable from this browser.
+ */
+export async function createRecoveredWalletClients(kernelAddress: Address): Promise<WalletClients> {
+  const { readRecoveryState } = await import('../lib/recovery')
+  const { toRecoveryKernelValidator } = await import('./recoveryValidator')
+  const { loadLocalRecoveryKey } = await import('../lib/recovery')
+  const { privateKeyToAccount } = await import('viem/accounts')
+
+  const state = await readRecoveryState(kernelAddress)
+  if (!state.permanentOwner || state.permanentOwner === '0x0000000000000000000000000000000000000000') {
+    throw new Error('NO_PERMANENT_OWNER')
+  }
+  const key = loadLocalRecoveryKey({ chainId: config.chainId, kernelAddress, recoveryNonce: state.recoveryNonce })
+  if (!key) throw new Error('LOCAL_KEY_MISSING')
+  const validator = await toRecoveryKernelValidator({
+    entryPoint,
+    kernelVersion,
+    chainId: config.chainId,
+    validatorAddress: config.validatorAddress,
+    signer: privateKeyToAccount(key.privateKey),
+    kind: 'owner',
+    accountId: state.accountId,
+  })
+  return createRecoveryWalletClients(validator, kernelAddress)
+}
+
 export async function waitForSuccess(kernelClient: WalletClients['kernelClient'], hash: Hex) {
   // 4s retryInterval (matching client polling) × 45 = up to 3 minutes for the
   // UserOperation to confirm on L1 Sepolia before giving up.

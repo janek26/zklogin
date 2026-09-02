@@ -151,7 +151,6 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
       setUserOpHash(hash)
       await waitForSuccess(clients.kernelClient, hash)
       setStage('RECOVERED')
-      props.onRecovered(kernelAddress)
     } catch (cause) {
       finalizeRef.current = false
       setError(cause instanceof Error ? cause.message : 'FINALIZE_FAILED')
@@ -239,7 +238,16 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
         <div className="progress-panel" aria-live="polite">
           <strong>{stage === 'STARTING' ? 'Starting recovery' : 'Completing recovery'}</strong>
           <span>Submitting sponsored transaction…</span>
-          {userOpHash && <code>{userOpHash}</code>}
+          {userOpHash && (
+            <a
+              className="tx-link"
+              href={`${config.chain.blockExplorers.default.url}/tx/${userOpHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View on explorer ↗
+            </a>
+          )}
         </div>
       )}
 
@@ -260,10 +268,26 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
         </>
       )}
 
-      {stage === 'RECOVERED' && (
+      {stage === 'RECOVERED' && kernelAddress && (
         <div className="recovery-done" role="status">
           <h1>Recovery complete</h1>
           <p>You now control the wallet from this browser. Move funds to a safer wallet with Send.</p>
+          {userOpHash && (
+            <a
+              className="tx-link"
+              href={`${config.chain.blockExplorers.default.url}/tx/${userOpHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View finalize transaction on explorer ↗
+            </a>
+          )}
+          <button
+            className="primary-button recovery-open-wallet"
+            onClick={() => props.onRecovered(kernelAddress)}
+          >
+            Open wallet
+          </button>
         </div>
       )}
 

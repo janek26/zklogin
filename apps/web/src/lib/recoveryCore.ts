@@ -241,6 +241,30 @@ export function deleteLocalRecoveryKey(args: { chainId: number; kernelAddress: A
   localStorage.removeItem(recoveryStorageKey(args))
 }
 
+// Recovered-wallet marker: lets refresh restore the local-owner dashboard
+// without a Google session (recovery is keyed by the local key, not Google).
+// ---------------------------------------------------------------------------
+
+export function recoveredWalletKey(chainId: number): string {
+  return `zklogin.recovered.${chainId}`
+}
+
+/** Records which kernel this browser holds the local owner key for. */
+export function rememberRecoveredWallet(chainId: number, kernelAddress: Address): void {
+  localStorage.setItem(recoveredWalletKey(chainId), getAddress(kernelAddress))
+}
+
+/** Returns the remembered kernel, or null when no recovery marker exists. */
+export function loadRecoveredWallet(chainId: number): Address | null {
+  const raw = localStorage.getItem(recoveredWalletKey(chainId))
+  return raw && isAddress(raw) ? getAddress(raw) : null
+}
+
+/** Clears the marker — used on forget/transfer-out of a recovered wallet. */
+export function forgetRecoveredWallet(chainId: number): void {
+  localStorage.removeItem(recoveredWalletKey(chainId))
+}
+
 // ---------------------------------------------------------------------------
 // Validation helpers
 // ---------------------------------------------------------------------------

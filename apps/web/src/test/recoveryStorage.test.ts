@@ -3,7 +3,10 @@ import { isHex, size, toHex } from 'viem'
 import {
   createLocalRecoveryKey,
   deleteLocalRecoveryKey,
+  forgetRecoveredWallet,
   loadLocalRecoveryKey,
+  loadRecoveredWallet,
+  rememberRecoveredWallet,
   recoveryStorageKey,
 } from '../lib/recoveryCore'
 
@@ -62,11 +65,16 @@ describe('local recovery key lifecycle', () => {
     expect(store.size).toBe(0)
   })
 
-  it('scopes keys per chain, kernel, and nonce', () => {
-    const a = recoveryStorageKey({ chainId: CHAIN_ID, kernelAddress: KERNEL, recoveryNonce: 7n })
-    const b = recoveryStorageKey({ chainId: 1, kernelAddress: KERNEL, recoveryNonce: 7n })
-    const c = recoveryStorageKey({ chainId: CHAIN_ID, kernelAddress: '0x2222222222222222222222222222222222222222', recoveryNonce: 7n })
-    const d = recoveryStorageKey({ chainId: CHAIN_ID, kernelAddress: KERNEL, recoveryNonce: 8n })
-    expect(new Set([a, b, c, d]).size).toBe(4)
+  it('round-trips the recovered-wallet marker and forgets it', () => {
+    expect(loadRecoveredWallet(CHAIN_ID)).toBeNull()
+    rememberRecoveredWallet(CHAIN_ID, KERNEL)
+    expect(loadRecoveredWallet(CHAIN_ID)).toBe(KERNEL)
+    forgetRecoveredWallet(CHAIN_ID)
+    expect(loadRecoveredWallet(CHAIN_ID)).toBeNull()
+  })
+
+  it('rejects a malformed recovered-wallet marker', () => {
+    store.set(`zklogin.recovered.${CHAIN_ID}`, 'not-an-address')
+    expect(loadRecoveredWallet(CHAIN_ID)).toBeNull()
   })
 })

@@ -1,16 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import type { Address } from 'viem'
 import { formatEther, parseEther } from 'viem'
 import { RecoveryBanner } from './components/RecoveryBanner'
 import { RecoveryLogin } from './components/RecoveryLogin'
 import { RefreshIcon } from './components/Icons'
-import { createRecoveryWalletClients, publicClient, waitForSuccess } from './aa/client'
-import { toRecoveryKernelValidator } from './aa/recoveryValidator'
-import { entryPoint, kernelVersion } from './aa/client'
+import { createRecoveredWalletClients, publicClient, waitForSuccess } from './aa/client'
 import { config } from './config'
-import { privateKeyToAccount } from 'viem/accounts'
-import { loadLocalRecoveryKey, readRecoveryState } from './lib/recovery'
+import { loadRecoveredWallet, rememberRecoveredWallet } from './lib/recovery'
 import './style.css'
 
 /**
@@ -28,8 +25,32 @@ function RecoveryEntry() {
   const [balance, setBalance] = useState<bigint>(0n)
   const [error, setError] = useState<string | null>(null)
   const [hash, setHash] = useState<`0x${string}` | null>(null)
+  const clientsRef = useRef<Awaited<ReturnType<typeof createRecoveredWalletClients>> | null>(null)
+
+  // Refresh restore: if this browser holds the owner key of a finalized
+  // recovery, go straight to the wallet instead of the login screen.
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      const marker = loadRecoveredWallet(config.chainId)
+      if (!marker) return
+      try {
+        const clients = await createRecoveredWalletClients(marker)
+        if (cancelled) return
+        clientsRef.current = clients
+        setKernelAddress(marker)
+        setBalance(await publicClient.getBalance({ address: marker }))
+      } catch {
+        // No owner key for the marker — fall back to the recovery login.
+      }
+    })()
+    return () => { cancelled = true }
+  }, [])
 
   const handleRecovered = async (kernel: Address) => {
+    rememberRecoveredWallet(config.chainId, kernel)
+    const clients = await createRecoveredWalletClients(kernel)
+    clientsRef.current = clients
     setKernelAddress(kernel)
     setBalance(await publicClient.getBalance({ address: kernel }))
   }
@@ -42,27 +63,9 @@ function RecoveryEntry() {
   const send = async (to: string, amount: string) => {
     if (!kernelAddress) return
     try {
-      const state = await readRecoveryState(kernelAddress)
-      if (!state.permanentOwner) throw new Error('NO_PERMANENT_OWNER')
-      const key = loadLocalRecoveryKey({
-        chainId: config.chainId,
-        kernelAddress,
-        recoveryNonce: state.recoveryNonce,
-      })
-      if (!key) throw new Error('LOCAL_KEY_MISSING')
-      const signer = privateKeyToAccount(key.privateKey)
-      const validator = await toRecoveryKernelValidator({
-        entryPoint,
-        kernelVersion,
-        chainId: config.chainId,
-        validatorAddress: config.validatorAddress,
-        signer,
-        kind: 'owner',
-        accountId: state.accountId,
-      })
-      const clients = await createRecoveryWalletClients(validator, kernelAddress)
+      const clients = clientsRef.current ?? await createRecoveredWalletClients(kernelAddress)
       const tx = await clients.kernelClient.sendUserOperation({
-                calls: [{ to: to as Address, value: parseEther(amount), data: '0x' }],
+        calls: [{ to: to as Address, value: parseEther(amount), data: '0x' }],
       })
       setHash(tx)
       await waitForSuccess(clients.kernelClient, tx)
@@ -76,9 +79,14 @@ function RecoveryEntry() {
     <main className="app-shell">
       <nav className="topbar" aria-label="Recovery navigation">
         <span className="topbar-title">zkLogin wallet · recovery</span>
-        <span className="network-badge"><i /> {config.chain.name}</span>
+        <div className="topbar-right">
+          {kernelAddress && (
+            <a className="text-button" href="/">Open full dashboard</a>
+          )}
+          <span className="network-badge"><i /> {config.chain.name}</span>
+        </div>
       </nav>
-      <section className="wallet-frame is-ready">
+      <section className={`wallet-frame ${kernelAddress ? 'is-ready' : ''}`}>
         {!kernelAddress ? (
           <RecoveryLogin onRecovered={(kernel) => { void handleRecovered(kernel) }} />
         ) : (
@@ -154,7 +162,15 @@ function SendForm(props: { onSend: (to: string, amount: string) => void; error: 
         Send
       </button>
       {props.error && <div className="alert compact" role="alert"><strong>Send needs attention</strong><span>{props.error}</span></div>}
-      {props.hash && <div className="receipt" role="status"><span className="receipt-dot" />UserOperation confirmed <code>{props.hash.slice(0, 10)}…</code></div>}
+      {props.hash && (
+        <div className="receipt" role="status">
+          <span className="receipt-dot" />
+          UserOperation confirmed{' '}
+          <a href={`${config.chain.blockExplorers.default.url}/tx/${props.hash}`} target="_blank" rel="noopener noreferrer">
+            <code>{props.hash.slice(0, 10)}…</code>
+          </a>
+        </div>
+      )}
     </section>
   )
 }
