@@ -866,29 +866,53 @@ input:focus {
 }
 
 .delay-chooser {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 .delay-card {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px 10px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: 2px 18px;
+  padding: 13px 18px 13px 44px;
   border: 1px solid #2c2b35;
   border-radius: 12px;
   background: #111117;
   color: #c3c1d0;
   text-align: left;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .15s;
 }
-.delay-card strong { font: 600 13px/1.3 'DM Mono', monospace; color: #e9e8f3; }
+.delay-card:hover { border-color: #3a3945; }
+.delay-card strong {
+  font: 600 14px/1.3 'DM Mono', monospace;
+  color: #e9e8f3;
+}
 .delay-card .delay-card-help {
   color: #777482;
-  font-size: 10.5px;
-  line-height: 1.45;
+  font-size: 12.5px;
+  line-height: 1.5;
 }
+/* Radio indicator on the left of each row. */
+.delay-card::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #4a4854;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.delay-card.selected::before { border-color: #b6ff6e; }
 .delay-card.selected { border-color: #b6ff6e; background: #141c10; }
 .delay-card.selected strong { color: #b6ff6e; }
+.delay-card.selected .delay-card-help { color: #8fae82; }
 .delay-card:disabled { opacity: .5; cursor: not-allowed; }
 
 .setup-actions {
