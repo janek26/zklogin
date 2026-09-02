@@ -92,12 +92,15 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
     setError(null)
     try {
       const auth = { params: result.params, proposedOwner: localKey.address, recoveryNonce }
+      // The proposal auth is the passport proof (mode 0x02), but the adapter
+      // still signs the userOp hash with the local key — give it a real
+      // signer so signUserOperation does not fail on a bare {address} stub.
       const validator = await toRecoveryKernelValidator({
         entryPoint,
         kernelVersion,
         chainId: config.chainId,
         validatorAddress: config.validatorAddress,
-        signer: { address: localKey.address } as never,
+        signer: privateKeyToAccount(localKey.privateKey),
         kind: 'proposal',
         accountId: state.accountId,
         proposalAuth: auth,
