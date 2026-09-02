@@ -5,7 +5,6 @@ import { createPreLoginSession, type PreLoginSession } from '../auth/nonce'
 import { publicClient } from '../aa/client'
 import { config } from '../config'
 import { PRELOGIN_KEY } from './utils'
-import type { StoredReadySession } from './types'
 
 export const validatorStateAbi = parseAbi(['function accountState(address kernel) view returns (bytes32 accountId,address sessionKey,uint48 sessionValidUntil)'])
 

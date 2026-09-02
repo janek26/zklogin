@@ -164,7 +164,7 @@ export function useRecovery(args: { wallet: Wallet | null; kernelAddress: Addres
       const calls = alsoRemoveGuardian
         ? [{ to: config.validatorAddress, value: 0n, data: makeCancelInnerData() }, { to: config.validatorAddress, value: 0n, data: makeClearGuardianInnerData() }]
         : [{ to: config.validatorAddress, value: 0n, data: makeCancelInnerData() }]
-      await runOp(() => args.wallet!.kernelClient.sendUserOperation({ calls: calls as never }))
+      await runOp(() => args.wallet!.kernelClient.sendUserOperation({ calls }))
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'CANCEL_FAILED')
       throw cause

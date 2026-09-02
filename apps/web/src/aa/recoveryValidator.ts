@@ -1,10 +1,10 @@
 import type { Address, Hex, LocalAccount } from 'viem'
-import { concatHex, encodeAbiParameters, toHex } from 'viem'
+import { concatHex, encodeAbiParameters } from 'viem'
 import { getUserOperationHash, type UserOperation } from 'viem/account-abstraction'
 import { toAccount } from 'viem/accounts'
 import type { EntryPointType, GetKernelVersion, KernelValidator } from '@zerodev/sdk/types'
 import type { PassportProofParams } from '../lib/recoveryCore'
-import { makeFinalizeCallData, makeProposeCallData } from '../lib/recoveryCore'
+import { makeFinalizeCallData, makeProposeCallData, toAbiParams } from '../lib/recoveryCore'
 
 const DUMMY_ECDSA_SIGNATURE = ('0xfffffffffffffffffffffffffffffff0000000000000000000000000000000007aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c') as Hex
 
@@ -34,7 +34,7 @@ const passportAuthAbi = [{
 export type PassportProposalAuth = { params: PassportProofParams; proposedOwner: Address; recoveryNonce: bigint }
 
 function encodeProposalMode(auth: PassportProposalAuth): Hex {
-  return concatHex(['0x02', encodeAbiParameters(passportAuthAbi, [{ ...auth, params: auth.params as never }])])
+  return concatHex(['0x02', encodeAbiParameters(passportAuthAbi, [{ ...auth, params: toAbiParams(auth.params) }])])
 }
 function encodeFinalizeMode(recoveryNonce: bigint, signature: Hex): Hex {
   return concatHex(['0x03', encodeAbiParameters([{ type: 'uint64' }, { type: 'bytes' }], [recoveryNonce, signature])])

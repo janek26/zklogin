@@ -11,7 +11,6 @@ import { entryPoint, kernelVersion } from './aa/client'
 import { config } from './config'
 import { privateKeyToAccount } from 'viem/accounts'
 import { loadLocalRecoveryKey, readRecoveryState } from './lib/recovery'
-import { makeFinalizeCallData } from './lib/recovery'
 import './style.css'
 
 /**
@@ -61,7 +60,7 @@ function RecoveryEntry() {
         kind: 'owner',
         accountId: state.accountId,
       })
-      const clients = await createRecoveryWalletClients(validator as never, kernelAddress)
+      const clients = await createRecoveryWalletClients(validator, kernelAddress)
       const tx = await clients.kernelClient.sendUserOperation({
                 calls: [{ to: to as Address, value: parseEther(amount), data: '0x' }],
       })

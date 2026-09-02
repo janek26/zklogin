@@ -86,6 +86,11 @@ export function requireBytes32(name: string, value: string): asserts value is He
   if (!isHex(value) || size(value) !== 32) throw new Error(`${name}_NOT_BYTES32`)
 }
 
+/** Asserts a value is 0x-prefixed hex of any length (bytes-typed ABI fields). */
+export function requireHex(name: string, value: string): asserts value is Hex {
+  if (!isHex(value)) throw new Error(`${name}_NOT_HEX`)
+}
+
 export function validStored(value: unknown): value is StoredReadySession {
   if (!value || typeof value !== 'object') return false
   const x = value as Record<string, unknown>

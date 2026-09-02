@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { decodeAbiParameters, encodeAbiParameters, size, type Hex } from 'viem'
+import { privateKeyToAccount } from 'viem/accounts'
+import { getEntryPoint } from '@zerodev/sdk/constants'
+import { KERNEL_V3_3 } from '@zerodev/sdk/constants'
 import { __testOnly, toRecoveryKernelValidator } from '../aa/recoveryValidator'
 
 describe('recovery validator wire format', () => {
   const params = {
-    version: `0x${'01'.repeat(32)}`,
-    proofVerificationData: { vkeyHash: `0x${'02'.repeat(32)}`, proof: '0xdeadbeef', publicInputs: [`0x${'03'.repeat(32)}`] },
-    committedInputs: '0xaabb',
+    version: `0x${'01'.repeat(32)}` as Hex,
+    proofVerificationData: { vkeyHash: `0x${'02'.repeat(32)}` as Hex, proof: '0xdeadbeef' as Hex, publicInputs: [`0x${'03'.repeat(32)}` as Hex] },
+    committedInputs: '0xaabb' as Hex,
     serviceConfig: { validityPeriodInSeconds: 604800, domain: 'zklogin-poc.rahrt.com', scope: 'policy-1:1', devMode: false },
-  } as never
+  }
   const owner = '0x3333333333333333333333333333333333333333' as `0x${string}`
   const sig = `0x${'44'.repeat(65)}` as `0x${string}`
 
@@ -42,11 +45,11 @@ describe('recovery validator wire format', () => {
   })
   it('carries devMode=true in the proposal auth serviceConfig tuple', () => {
     const devModeParams = {
-      version: `0x${'01'.repeat(32)}`,
-      proofVerificationData: { vkeyHash: `0x${'02'.repeat(32)}`, proof: '0xdeadbeef', publicInputs: [`0x${'03'.repeat(32)}`] },
-      committedInputs: '0xaabb',
+      version: `0x${'01'.repeat(32)}` as Hex,
+      proofVerificationData: { vkeyHash: `0x${'02'.repeat(32)}` as Hex, proof: '0xdeadbeef' as Hex, publicInputs: [`0x${'03'.repeat(32)}` as Hex] },
+      committedInputs: '0xaabb' as Hex,
       serviceConfig: { validityPeriodInSeconds: 604800, domain: 'zklogin-poc.rahrt.com', scope: 'policy-1:1', devMode: true },
-    } as never
+    }
     const encoded = __testOnly.encodeProposalMode({ params: devModeParams, proposedOwner: owner, recoveryNonce: 1n })
     const authAbi = [{
       type: 'tuple',
@@ -81,11 +84,11 @@ describe('recovery validator wire format', () => {
     // with KERNEL_ADDRESS_DERIVATION_MISMATCH.
     const accountId = `0x${'ab'.repeat(32)}` as Hex
     const validator = await toRecoveryKernelValidator({
-      entryPoint: undefined as never,
-      kernelVersion: undefined as never,
+      entryPoint: getEntryPoint('0.7'),
+      kernelVersion: KERNEL_V3_3,
       chainId: 11155111,
       validatorAddress: owner,
-      signer: { address: owner, type: 'local' } as never,
+      signer: privateKeyToAccount(`0x${'11'.repeat(32)}`),
       kind: 'owner',
       accountId,
     })

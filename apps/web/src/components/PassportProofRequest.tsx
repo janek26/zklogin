@@ -3,6 +3,7 @@ import { getAddress } from 'viem'
 import { ZKPassportQRCode } from '@zkpassport/ui/react'
 import type { ProofResult, QueryBuilder, QueryBuilderResult, SolidityVerifierParameters } from '@zkpassport/sdk'
 import type { PassportProofParams } from '../lib/recovery'
+import { requireHex } from '../lib/utils'
 
 export type PassportProofAction = 'SET_GUARDIAN' | 'PROPOSE_RECOVERY'
 
@@ -78,15 +79,26 @@ export function PassportProofRequest(props: {
       devMode: verifierParams.serviceConfig.devMode,
       proofBytes: verifierParams.proofVerificationData.proof.length,
     })
+    // The SDK types these as plain string; assert they really are 0x-hex
+    // before handing them to the ABI encoders (no blind casts).
+    const { version, proofVerificationData, committedInputs } = verifierParams
+    requireHex('proof version', version)
+    requireHex('proof vkeyHash', proofVerificationData.vkeyHash)
+    requireHex('proof data', proofVerificationData.proof)
+    requireHex('proof committedInputs', committedInputs)
+    const publicInputs = proofVerificationData.publicInputs.map((input, index) => {
+      requireHex(`proof publicInputs[${index}]`, input)
+      return input
+    })
     props.onResult({
       params: {
-        version: verifierParams.version as `0x${string}`,
+        version,
         proofVerificationData: {
-          vkeyHash: verifierParams.proofVerificationData.vkeyHash as `0x${string}`,
-          proof: verifierParams.proofVerificationData.proof as `0x${string}`,
-          publicInputs: verifierParams.proofVerificationData.publicInputs as `0x${string}`[],
+          vkeyHash: proofVerificationData.vkeyHash,
+          proof: proofVerificationData.proof,
+          publicInputs,
         },
-        committedInputs: verifierParams.committedInputs as `0x${string}`,
+        committedInputs,
         serviceConfig: verifierParams.serviceConfig,
       },
       uniqueIdentifier,

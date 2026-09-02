@@ -50,6 +50,26 @@ export type PassportProofParams = {
   serviceConfig: { validityPeriodInSeconds: number; domain: string; scope: string; devMode: boolean }
 }
 
+/**
+ * ABI-shaped passport params for `encodeFunctionData`/`encodeAbiParameters`.
+ * The SDK returns `validityPeriodInSeconds` as a JS number; Solidity's
+ * `uint256` requires a bigint, so the conversion happens here — at the encode
+ * boundary — rather than via type casts at every call site.
+ */
+export type PassportProofParamsAbi = {
+  version: Hex
+  proofVerificationData: { vkeyHash: Hex; proof: Hex; publicInputs: Hex[] }
+  committedInputs: Hex
+  serviceConfig: { validityPeriodInSeconds: bigint; domain: string; scope: string; devMode: boolean }
+}
+
+export function toAbiParams(params: PassportProofParams): PassportProofParamsAbi {
+  return {
+    ...params,
+    serviceConfig: { ...params.serviceConfig, validityPeriodInSeconds: BigInt(params.serviceConfig.validityPeriodInSeconds) },
+  }
+}
+
 export type RecoveryProposal = {
   proposedOwner: Address
   executableAt: number
@@ -141,7 +161,7 @@ export function makeProposeInnerData(args: { params: PassportProofParams; propos
   return encodeFunctionData({
     abi: recoveryAbi,
     functionName: 'proposeRecovery',
-    args: [args.params as never, args.proposedOwner, args.recoveryNonce],
+    args: [toAbiParams(args.params), args.proposedOwner, args.recoveryNonce],
   })
 }
 
@@ -170,7 +190,7 @@ export function makeFinalizeCallData(args: { validatorAddress: Address; recovery
 
 /** Inner `setGuardian(params, delay)` call (executed via session/proof modes). */
 export function makeSetGuardianInnerData(args: { params: PassportProofParams; delaySeconds: number }): Hex {
-  return encodeFunctionData({ abi: recoveryAbi, functionName: 'setGuardian', args: [args.params as never, args.delaySeconds] })
+  return encodeFunctionData({ abi: recoveryAbi, functionName: 'setGuardian', args: [toAbiParams(args.params), args.delaySeconds] })
 }
 
 /** Inner `cancelRecovery()` call. */

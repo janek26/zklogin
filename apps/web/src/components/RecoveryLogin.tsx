@@ -111,7 +111,7 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
         proposedOwner: localKey.address,
         recoveryNonce,
       })
-      const clients = await createRecoveryWalletClients(validator as never, kernelAddress)
+      const clients = await createRecoveryWalletClients(validator, kernelAddress)
       const hash = await clients.kernelClient.sendUserOperation({ callData })
       setUserOpHash(hash)
       await waitForSuccess(clients.kernelClient, hash)
@@ -146,7 +146,7 @@ export function RecoveryLogin(props: { onRecovered: (kernelAddress: Address) => 
         validatorAddress: config.validatorAddress,
         recoveryNonce: state.recovery.nonce,
       })
-      const clients = await createRecoveryWalletClients(validator as never, kernelAddress)
+      const clients = await createRecoveryWalletClients(validator, kernelAddress)
       const hash = await clients.kernelClient.sendUserOperation({ callData })
       setUserOpHash(hash)
       await waitForSuccess(clients.kernelClient, hash)
